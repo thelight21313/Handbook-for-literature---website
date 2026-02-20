@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тесты | Литературный справочник</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #2F4F2F;
+            --accent-color: #DAA520;
+            --background-light: #FAF6F1;
+            --text-dark: #2C1810;
+            --text-muted: #6B5D54;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--background-light);
+            padding-top: 80px;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.8rem;
+        }
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-dark) !important;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover { color: var(--primary-color) !important; }
+        .main-content { padding: 40px 0; max-width: 1400px; margin: 0 auto; }
+        .page-header { text-align: center; margin-bottom: 50px; position: relative; }
+        .page-header::before {
+            content: ''; position: absolute; top: -20px; left: 50%;
+            transform: translateX(-50%); width: 80px; height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+        .page-header h1 {
+            font-family: 'Playfair Display', serif; font-size: 3rem;
+            color: var(--primary-color); margin-bottom: 15px; font-weight: 700;
+        }
+        .page-header p { color: var(--text-muted); font-size: 1.1rem; max-width: 700px; margin: 0 auto; }
+
+        /* ── SIDEBAR ── */
+        .filters-section {
+            background: white; border-radius: 20px; padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            position: sticky; top: 100px;
+        }
+        .filter-title {
+            font-family: 'Playfair Display', serif; font-size: 1.5rem;
+            color: var(--primary-color); margin-bottom: 25px; font-weight: 600;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .filter-group { margin-bottom: 25px; }
+        .filter-group h6 {
+            font-weight: 600; color: var(--text-dark); margin-bottom: 15px;
+            font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: space-between; padding: 10px 0;
+            transition: color 0.3s ease; user-select: none;
+        }
+        .filter-group h6:hover { color: var(--primary-color); }
+        .filter-group h6 i { font-size: 0.8rem; transition: transform 0.3s ease; }
+        .filter-group h6.collapsed i { transform: rotate(-90deg); }
+        .filter-options {
+            max-height: 500px; overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease; opacity: 1;
+        }
+        .filter-options.collapsed { max-height: 0; opacity: 0; }
+        .filter-option {
+            display: flex; align-items: center; padding: 10px;
+            margin-bottom: 8px; border-radius: 10px; transition: all 0.3s ease; cursor: pointer;
+        }
+        .filter-option:hover { background: var(--background-light); }
+        .filter-option input[type="checkbox"] {
+            width: 20px; height: 20px; margin-right: 12px;
+            cursor: pointer; accent-color: var(--accent-color);
+        }
+        .filter-option label { cursor: pointer; margin: 0; flex: 1; color: var(--text-dark); }
+        .search-input {
+            width: 100%; padding: 12px 15px;
+            border: 2px solid rgba(139, 69, 19, 0.15);
+            border-radius: 10px; font-size: 0.95rem; transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: var(--accent-color); outline: none;
+            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.1);
+        }
+        .btn-reset-filters {
+            width: 100%; padding: 12px; background: transparent;
+            border: 2px solid var(--primary-color); color: var(--primary-color);
+            border-radius: 10px; font-weight: 600; transition: all 0.3s ease; cursor: pointer;
+        }
+        .btn-reset-filters:hover { background: var(--primary-color); color: white; }
+
+        /* ── QUIZ CARDS ── */
+        .quizzes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px; margin-top: 30px;
+        }
+        .quiz-card {
+            background: white; border-radius: 15px; padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06); transition: all 0.3s ease;
+            cursor: pointer; border: 1px solid rgba(139, 69, 19, 0.05); position: relative;
+            display: flex; flex-direction: column;
+        }
+        .quiz-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(139, 69, 19, 0.12); }
+        .quiz-difficulty {
+            position: absolute; top: 15px; right: 15px;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600;
+        }
+        .quiz-difficulty.easy   { background: #d4edda; color: #155724; }
+        .quiz-difficulty.medium { background: #fff3cd; color: #856404; }
+        .quiz-difficulty.hard   { background: #f8d7da; color: #721c24; }
+        .quiz-title {
+            font-family: 'Playfair Display', serif; font-size: 1.3rem;
+            color: var(--primary-color); margin-bottom: 10px; font-weight: 600;
+            line-height: 1.4; padding-right: 80px;
+        }
+        .quiz-description {
+            color: var(--text-muted); line-height: 1.6;
+            margin-bottom: 15px; font-size: 0.9rem; flex: 1;
+        }
+        .quiz-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .quiz-tag {
+            background: var(--background-light); color: var(--text-dark);
+            padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;
+            border: 1px solid rgba(139, 69, 19, 0.1);
+        }
+        .quiz-tag i { color: var(--accent-color); margin-right: 4px; }
+        .quiz-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        .quiz-meta { font-size: 0.82rem; color: var(--text-muted); display: flex; gap: 16px; }
+        .quiz-meta span { display: flex; align-items: center; gap: 5px; }
+        .btn-start {
+            background: var(--primary-color); color: white;
+            border: none; padding: 8px 18px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; font-family: 'Montserrat', sans-serif;
+        }
+        .btn-start:hover { background: #6d3410; transform: scale(1.03); }
+
+        /* ── EMPTY STATE ── */
+        .empty-state { text-align: center; padding: 80px 20px; grid-column: 1 / -1; }
+        .empty-icon { font-size: 4rem; color: rgba(139, 69, 19, 0.2); margin-bottom: 20px; }
+
+        /* ── QUIZ TAKING VIEW ── */
+        .quiz-taking-card {
+            background: white; border-radius: 20px; padding: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 820px; margin: 0 auto;
+        }
+        .quiz-taking-header { margin-bottom: 30px; }
+        .quiz-taking-title {
+            font-family: 'Playfair Display', serif; font-size: 2rem;
+            color: var(--primary-color); margin-bottom: 8px;
+        }
+        .quiz-taking-meta { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* прогресс */
+        .quiz-progress { margin-bottom: 36px; }
+        .quiz-progress-bar-wrap {
+            background: var(--background-light); border-radius: 10px;
+            height: 8px; overflow: hidden; margin-bottom: 8px;
+        }
+        .quiz-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px; transition: width 0.4s ease;
+        }
+        .quiz-progress-label { font-size: 0.82rem; color: var(--text-muted); }
+
+        /* вопрос */
+        .question-block { animation: fadeSlide 0.35s ease both; }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateX(20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .question-number {
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;
+            text-transform: uppercase; color: var(--accent-color); margin-bottom: 12px;
+        }
+        .question-text {
+            font-family: 'Playfair Display', serif; font-size: 1.35rem;
+            color: var(--text-dark); margin-bottom: 28px; line-height: 1.5;
+        }
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 20px; border-radius: 12px; cursor: pointer;
+            border: 2px solid rgba(139, 69, 19, 0.12);
+            background: white; text-align: left;
+            font-family: 'Montserrat', sans-serif; font-size: 0.95rem;
+            color: var(--text-dark); transition: all 0.2s ease;
+            width: 100%;
+        }
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-color);
+            background: rgba(218, 165, 32, 0.05);
+        }
+        .option-btn.selected {
+            border-color: var(--primary-color);
+            background: rgba(139, 69, 19, 0.06);
+        }
+        .option-letter {
+            width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.8rem;
+            background: var(--background-light);
+            color: var(--text-muted); transition: all 0.2s;
+        }
+        .option-btn.selected .option-letter {
+            background: var(--primary-color); color: white;
+        }
+        .question-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 36px; padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        .btn-nav {
+            padding: 10px 24px; border-radius: 10px;
+            font-family: 'Montserrat', sans-serif; font-weight: 600;
+            font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-nav-prev {
+            background: transparent; border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        .btn-nav-prev:hover { background: var(--primary-color); color: white; }
+        .btn-nav-next {
+            background: var(--primary-color); border: 2px solid var(--primary-color);
+            color: white;
+        }
+        .btn-nav-next:hover { background: #6d3410; }
+        .btn-nav-next:disabled {
+            opacity: 0.4; cursor: not-allowed;
+        }
+        .btn-nav-submit {
+            background: var(--secondary-color); border: 2px solid var(--secondary-color);
+            color: white;
+        }
+        .btn-nav-submit:hover { background: #1e3a1e; }
+
+        /* индикаторы вопросов */
+        .question-dots {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            margin-bottom: 28px;
+        }
+        .q-dot {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            border: 2px solid rgba(139,69,19,0.15);
+            background: white; color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .q-dot.answered { background: var(--background-light); border-color: var(--primary-color); color: var(--primary-color); }
+        .q-dot.active { background: var(--primary-color); border-color: var(--primary-color); color: white; }
+
+        /* ── РЕЗУЛЬТАТ ── */
+        .result-card {
+            background: white; border-radius: 20px; padding: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 820px; margin: 0 auto;
+        }
+        .result-header { text-align: center; margin-bottom: 40px; }
+        .result-score-circle {
+            width: 130px; height: 130px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            border: 5px solid var(--primary-color);
+        }
+        .result-score-circle .score-num {
+            font-family: 'Playfair Display', serif; font-size: 2.5rem;
+            font-weight: 700; color: var(--primary-color); line-height: 1;
+        }
+        .result-score-circle .score-total {
+            font-size: 0.85rem; color: var(--text-muted);
+        }
+        .result-grade {
+            font-family: 'Playfair Display', serif; font-size: 1.6rem;
+            color: var(--text-dark); margin-bottom: 8px;
+        }
+        .result-percent { color: var(--text-muted); font-size: 1rem; }
+
+        /* цвета круга по оценке */
+        .result-score-circle.excellent { border-color: #28a745; }
+        .result-score-circle.excellent .score-num { color: #28a745; }
+        .result-score-circle.good      { border-color: var(--accent-color); }
+        .result-score-circle.good      .score-num { color: var(--accent-color); }
+        .result-score-circle.okay      { border-color: #fd7e14; }
+        .result-score-circle.okay      .score-num { color: #fd7e14; }
+        .result-score-circle.poor      { border-color: #dc3545; }
+        .result-score-circle.poor      .score-num { color: #dc3545; }
+
+        /* разбор ответов */
+        .result-breakdown { margin-top: 32px; }
+        .result-breakdown-title {
+            font-family: 'Playfair Display', serif; font-size: 1.3rem;
+            color: var(--primary-color); margin-bottom: 20px;
+        }
+        .result-item {
+            padding: 18px 20px; border-radius: 12px; margin-bottom: 14px;
+            border-left: 4px solid transparent;
+        }
+        .result-item.correct   { background: #f0fff4; border-color: #28a745; }
+        .result-item.incorrect { background: #fff5f5; border-color: #dc3545; }
+        .result-item-question {
+            font-weight: 600; color: var(--text-dark);
+            margin-bottom: 10px; font-size: 0.95rem;
+        }
+        .result-item-answers { display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; }
+        .answer-line { display: flex; align-items: center; gap: 8px; }
+        .answer-line.your-answer   { color: var(--text-dark); }
+        .answer-line.right-answer  { color: #28a745; font-weight: 600; }
+        .answer-line.wrong-answer  { color: #dc3545; text-decoration: line-through; }
+        .answer-line i { width: 16px; flex-shrink: 0; }
+
+        .result-actions {
+            display: flex; gap: 16px; justify-content: center;
+            margin-top: 36px; flex-wrap: wrap;
+        }
+        .btn-action {
+            padding: 12px 28px; border-radius: 12px;
+            font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .btn-retry {
+            background: var(--primary-color); color: white; border: 2px solid var(--primary-color);
+        }
+        .btn-retry:hover { background: #6d3410; }
+        .btn-back-list {
+            background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color);
+        }
+        .btn-back-list:hover { background: var(--primary-color); color: white; }
+
+        /* ── BACK BUTTON ── */
+        .back-button {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 12px 24px; background: white;
+            border: 2px solid var(--primary-color); border-radius: 12px;
+            color: var(--primary-color); font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; margin-bottom: 30px; font-family: 'Montserrat', sans-serif;
+        }
+        .back-button:hover { background: var(--primary-color); color: white; transform: translateX(-5px); }
+
+        @media (max-width: 992px) {
+            .filters-section { position: static; margin-bottom: 30px; }
+            .quizzes-grid { grid-template-columns: 1fr; }
+            .quiz-taking-card, .result-card { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-book-open me-2" style="color: var(--accent-color);"></i>
+                ЛитСправочник
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'writers' %}">Писатели</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'works' %}">Произведения</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'tests' %}">Тесты</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'facts' %}">Интересные факты</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'ai_assistant' %}">AI-ассистент</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+
+        <!-- ══════════════ LIST VIEW ══════════════ -->
+        <div id="listView" style="display: block;">
+            <div class="page-header" data-aos="fade-down">
+                <h1>Тесты по литературе</h1>
+                <p>Проверьте свои знания о писателях, произведениях и эпохах русской литературы</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="filters-section" data-aos="fade-right">
+                        <div class="filter-title">
+                            <i class="fas fa-filter"></i> Фильтры
+                        </div>
+
+                        <div class="filter-group">
+                            <input type="text" class="search-input" id="searchInput"
+                                   placeholder="Поиск тестов..." oninput="handleSearch()">
+                        </div>
+
+                        <div class="filter-group">
+                            <h6 onclick="toggleFilterGroup(this)">
+                                Тип теста <i class="fas fa-chevron-down"></i>
+                            </h6>
+                            <div class="filter-options">
+                                <div class="filter-option">
+                                    <input type="checkbox" id="type-writer" name="type" value="writer" onchange="handleFilterChange()">
+                                    <label for="type-writer">О писателях</label>
+                                </div>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="type-work" name="type" value="work" onchange="handleFilterChange()">
+                                    <label for="type-work">О произведениях</label>
+                                </div>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="type-general" name="type" value="general" onchange="handleFilterChange()">
+                                    <label for="type-general">Общие о литературе</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h6 onclick="toggleFilterGroup(this)">
+                                Сложность <i class="fas fa-chevron-down"></i>
+                            </h6>
+                            <div class="filter-options">
+                                <div class="filter-option">
+                                    <input type="checkbox" id="diff-easy" name="difficulty" value="easy" onchange="handleFilterChange()">
+                                    <label for="diff-easy">Лёгкий</label>
+                                </div>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="diff-medium" name="difficulty" value="medium" onchange="handleFilterChange()">
+                                    <label for="diff-medium">Средний</label>
+                                </div>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="diff-hard" name="difficulty" value="hard" onchange="handleFilterChange()">
+                                    <label for="diff-hard">Сложный</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn-reset-filters" onclick="resetFilters()">
+                            <i class="fas fa-redo me-2"></i> Сбросить фильтры
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-lg-9">
+                    <div class="quizzes-grid" id="quizzesGrid">
+                        <!-- загружается через JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════ QUIZ TAKING VIEW ══════════════ -->
+        <div id="quizView" style="display: none;">
+            <button class="back-button" onclick="exitQuiz()">
+                <i class="fas fa-arrow-left"></i> Вернуться к тестам
+            </button>
+            <div class="quiz-taking-card">
+                <div class="quiz-taking-header">
+                    <h2 class="quiz-taking-title" id="quizTitle"></h2>
+                    <div class="quiz-taking-meta" id="quizMeta"></div>
+                </div>
+
+                <div class="quiz-progress">
+                    <div class="quiz-progress-bar-wrap">
+                        <div class="quiz-progress-bar" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <div class="quiz-progress-label" id="progressLabel"></div>
+                </div>
+
+                <!-- точки-навигатор -->
+                <div class="question-dots" id="questionDots"></div>
+
+                <!-- сам вопрос -->
+                <div class="question-block" id="questionBlock"></div>
+
+                <div class="question-nav">
+                    <button class="btn-nav btn-nav-prev" id="btnPrev" onclick="prevQuestion()">
+                        <i class="fas fa-chevron-left me-1"></i> Назад
+                    </button>
+                    <button class="btn-nav btn-nav-next" id="btnNext" onclick="nextQuestion()">
+                        Далее <i class="fas fa-chevron-right ms-1"></i>
+                    </button>
+                    <button class="btn-nav btn-nav-submit" id="btnSubmit" onclick="submitQuiz()" style="display:none;">
+                        Завершить тест <i class="fas fa-check ms-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════ RESULT VIEW ══════════════ -->
+        <div id="resultView" style="display: none;">
+            <button class="back-button" onclick="goBackToList()">
+                <i class="fas fa-arrow-left"></i> Вернуться к тестам
+            </button>
+            <div class="result-card" id="resultCard"></div>
+        </div>
+
+    </div><!-- /main-content -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+    AOS.init({ duration: 800, once: true });
+
+    // ══════════════════════════════════
+    //  СОСТОЯНИЕ
+    // ══════════════════════════════════
+    let activeFilters = { type: [], difficulty: [], search: '' };
+    let fetchController = null;
+    let searchTimeout = null;
+
+    // состояние прохождения теста
+    let quiz = null;          // данные теста (вопросы)
+    let answers = {};         // { question_id: option_id }
+    let currentQ = 0;         // индекс текущего вопроса
+
+    // ══════════════════════════════════
+    //  ФИЛЬТРЫ
+    // ══════════════════════════════════
+    function toggleFilterGroup(header) {
+        header.classList.toggle('collapsed');
+        header.nextElementSibling.classList.toggle('collapsed');
+    }
+
+    function handleFilterChange() {
+        activeFilters = { type: [], difficulty: [], search: document.getElementById('searchInput').value.trim() };
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            if      (cb.name === 'type')       activeFilters.type.push(cb.value);
+            else if (cb.name === 'difficulty') activeFilters.difficulty.push(cb.value);
+        });
+        fetchQuizzes();
+    }
+
+    function handleSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            activeFilters.search = document.getElementById('searchInput').value.trim();
+            fetchQuizzes();
+        }, 350);
+    }
+
+    function resetFilters() {
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        document.getElementById('searchInput').value = '';
+        activeFilters = { type: [], difficulty: [], search: '' };
+        fetchQuizzes();
+    }
+
+    // ══════════════════════════════════
+    //  URL
+    // ══════════════════════════════════
+    function buildApiURL() {
+        const p = new URLSearchParams();
+        if (activeFilters.type.length)       p.append('type',       activeFilters.type.join(','));
+        if (activeFilters.difficulty.length) p.append('difficulty', activeFilters.difficulty.join(','));
+        if (activeFilters.search)            p.append('search',     activeFilters.search);
+        return '/api/quizzes/?' + p.toString();
+    }
+
+    function buildPageURL() {
+        return buildApiURL().replace('/api/quizzes/', '/tests/');
+    }
+
+    // ══════════════════════════════════
+    //  ЗАГРУЗКА СПИСКА
+    // ══════════════════════════════════
+    async function fetchQuizzes() {
+        if (fetchController) fetchController.abort();
+        fetchController = new AbortController();
+
+        history.replaceState({ view: 'list' }, '', buildPageURL());
+
+        try {
+            const res = await fetch(buildApiURL(), { signal: fetchController.signal });
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            renderQuizzes(data.quizzes || []);
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error('Fetch error:', err);
+        }
+    }
+
+    // ══════════════════════════════════
+    //  РЕНДЕР КАРТОЧЕК
+    // ══════════════════════════════════
+    const DIFFICULTY_LABELS = { easy: 'Лёгкий', medium: 'Средний', hard: 'Сложный' };
+
+    function renderQuizzes(quizzes) {
+        const grid = document.getElementById('quizzesGrid');
+
+        if (!quizzes.length) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-question-circle"></i></div>
+                    <h3>Тесты не найдены</h3>
+                    <p>Попробуйте изменить параметры фильтрации</p>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = '';
+        quizzes.forEach(q => {
+            const card = document.createElement('div');
+            card.className = 'quiz-card';
+            card.innerHTML = `
+                <span class="quiz-difficulty ${q.difficulty}">${DIFFICULTY_LABELS[q.difficulty] || q.difficulty}</span>
+                <div class="quiz-title">${esc(q.title)}</div>
+                <div class="quiz-description">${esc(q.description || '')}</div>
+                <div class="quiz-tags">
+                    ${q.writer_name ? `<span class="quiz-tag"><i class="fas fa-user"></i>${esc(q.writer_name)}</span>` : ''}
+                    ${q.work_title  ? `<span class="quiz-tag"><i class="fas fa-book"></i>${esc(q.work_title)}</span>`  : ''}
+                </div>
+                <div class="quiz-footer">
+                    <div class="quiz-meta">
+                        <span><i class="fas fa-list-ol"></i> ${q.questions_count} вопросов</span>
+                        <span><i class="fas fa-users"></i> ${q.times_taken} прохождений</span>
+                    </div>
+                    <button class="btn-start" onclick="startQuiz(${q.id})">
+                        Начать <i class="fas fa-play ms-1"></i>
+                    </button>
+                </div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    // ══════════════════════════════════
+    //  НАЧАЛО ТЕСТА
+    // ══════════════════════════════════
+    async function startQuiz(quizId) {
+        try {
+            const res = await fetch(`/api/quizzes/${quizId}/`);
+            if (!res.ok) throw new Error();
+            quiz = await res.json();
+            answers = {};
+            currentQ = 0;
+
+            history.pushState({ view: 'quiz', quizId }, '', `/tests/${quizId}/`);
+            renderQuizUI();
+            showView('quizView');
+        } catch (err) {
+            console.error('Error loading quiz:', err);
+        }
+    }
+
+    // ══════════════════════════════════
+    //  РЕНДЕР UI ТЕСТА
+    // ══════════════════════════════════
+    function renderQuizUI() {
+        document.getElementById('quizTitle').textContent = quiz.title;
+
+        const metaParts = [];
+        if (quiz.writer_name) metaParts.push(`<i class="fas fa-user me-1"></i>${esc(quiz.writer_name)}`);
+        if (quiz.work_title)  metaParts.push(`<i class="fas fa-book me-1"></i>${esc(quiz.work_title)}`);
+        if (quiz.difficulty)  metaParts.push(`<i class="fas fa-signal me-1"></i>${DIFFICULTY_LABELS[quiz.difficulty]}`);
+        document.getElementById('quizMeta').innerHTML = metaParts.join(' &nbsp;·&nbsp; ');
+
+        renderDots();
+        renderQuestion();
+    }
+
+    function renderDots() {
+        const wrap = document.getElementById('questionDots');
+        wrap.innerHTML = '';
+        quiz.questions.forEach((q, i) => {
+            const dot = document.createElement('div');
+            dot.className = 'q-dot' + (answers[q.id] ? ' answered' : '') + (i === currentQ ? ' active' : '');
+            dot.textContent = i + 1;
+            dot.onclick = () => jumpToQuestion(i);
+            wrap.appendChild(dot);
+        });
+    }
+
+    function renderQuestion() {
+        const q = quiz.questions[currentQ];
+        const total = quiz.questions.length;
+        const answered = Object.keys(answers).length;
+
+        // прогресс
+        const pct = Math.round((answered / total) * 100);
+        document.getElementById('progressBar').style.width = pct + '%';
+        document.getElementById('progressLabel').textContent =
+            `Отвечено ${answered} из ${total}`;
+
+        // кнопки навигации
+        document.getElementById('btnPrev').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+
+        const isLast = currentQ === total - 1;
+        document.getElementById('btnNext').style.display   = isLast ? 'none' : 'inline-flex';
+        document.getElementById('btnSubmit').style.display = isLast ? 'inline-flex' : 'none';
+
+        // вопрос
+        const letters = ['А', 'Б', 'В', 'Г', 'Д', 'Е'];
+        document.getElementById('questionBlock').innerHTML = `
+            <div class="question-number">Вопрос ${currentQ + 1} из ${total}</div>
+            <div class="question-text">${esc(q.text)}</div>
+            <div class="options-list">
+                ${q.options.map((opt, i) => `
+                    <button class="option-btn ${answers[q.id] === opt.id ? 'selected' : ''}"
+                            onclick="selectOption(${q.id}, ${opt.id}, this)">
+                        <span class="option-letter">${letters[i] || i + 1}</span>
+                        ${esc(opt.text)}
+                    </button>`).join('')}
+            </div>`;
+
+        renderDots();
+    }
+
+    function selectOption(questionId, optionId, btn) {
+        answers[questionId] = optionId;
+
+        // снять выделение с других кнопок этого вопроса
+        btn.closest('.options-list').querySelectorAll('.option-btn').forEach(b => {
+            b.classList.remove('selected');
+            b.querySelector('.option-letter').style.background = '';
+            b.querySelector('.option-letter').style.color = '';
+        });
+        btn.classList.add('selected');
+
+        renderDots();
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const total = quiz.questions.length;
+        const answered = Object.keys(answers).length;
+        const pct = Math.round((answered / total) * 100);
+        document.getElementById('progressBar').style.width = pct + '%';
+        document.getElementById('progressLabel').textContent = `Отвечено ${answered} из ${total}`;
+    }
+
+    function nextQuestion() {
+        if (currentQ < quiz.questions.length - 1) {
+            currentQ++;
+            renderQuestion();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQ > 0) {
+            currentQ--;
+            renderQuestion();
+        }
+    }
+
+    function jumpToQuestion(index) {
+        currentQ = index;
+        renderQuestion();
+    }
+
+    // ══════════════════════════════════
+    //  ОТПРАВКА ОТВЕТОВ
+    // ══════════════════════════════════
+    async function submitQuiz() {
+        const unanswered = quiz.questions.filter(q => !answers[q.id]).length;
+        if (unanswered > 0) {
+            const ok = confirm(`Вы ответили не на все вопросы (осталось ${unanswered}). Завершить тест?`);
+            if (!ok) return;
+        }
+
+        const payload = {
+            answers: Object.entries(answers).map(([qId, oId]) => ({
+                question_id: parseInt(qId),
+                option_id: parseInt(oId)
+            }))
+        };
+
+        try {
+            const res = await fetch(`/api/quizzes/${quiz.id}/submit/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error();
+            const result = await res.json();
+
+            history.replaceState({ view: 'result', quizId: quiz.id }, '', `/tests/${quiz.id}/result/`);
+            renderResult(result);
+            showView('resultView');
+        } catch (err) {
+            console.error('Submit error:', err);
+            alert('Произошла ошибка при отправке. Попробуйте ещё раз.');
+        }
+    }
+
+    // ══════════════════════════════════
+    //  РЕНДЕР РЕЗУЛЬТАТА
+    // ══════════════════════════════════
+    const GRADE_LABELS = {
+        excellent: '🏆 Отлично!',
+        good:      '👍 Хорошо',
+        okay:      '📚 Неплохо',
+        poor:      '😅 Стоит повторить'
+    };
+
+    function renderResult(result) {
+        const card = document.getElementById('resultCard');
+        card.innerHTML = `
+            <div class="result-header">
+                <div class="result-score-circle ${result.grade}">
+                    <span class="score-num">${result.score}</span>
+                    <span class="score-total">из ${result.total}</span>
+                </div>
+                <div class="result-grade">${GRADE_LABELS[result.grade] || result.grade}</div>
+                <div class="result-percent">${result.percentage}% правильных ответов</div>
+            </div>
+
+            <div class="result-breakdown">
+                <div class="result-breakdown-title">Разбор ответов</div>
+                ${result.results.map(r => `
+                    <div class="result-item ${r.is_correct ? 'correct' : 'incorrect'}">
+                        <div class="result-item-question">${esc(r.question_text)}</div>
+                        <div class="result-item-answers">
+                            ${r.is_correct ? `
+                                <div class="answer-line right-answer">
+                                    <i class="fas fa-check"></i>
+                                    Верно: ${esc(r.correct_option_text)}
+                                </div>` : `
+                                <div class="answer-line wrong-answer">
+                                    <i class="fas fa-times"></i>
+                                    Ваш ответ: ${esc(r.selected_option_text || 'не отвечено')}
+                                </div>
+                                <div class="answer-line right-answer">
+                                    <i class="fas fa-check"></i>
+                                    Правильно: ${esc(r.correct_option_text)}
+                                </div>`}
+                        </div>
+                    </div>`).join('')}
+            </div>
+
+            <div class="result-actions">
+                <button class="btn-action btn-retry" onclick="retryQuiz()">
+                    <i class="fas fa-redo me-2"></i> Пройти снова
+                </button>
+                <button class="btn-action btn-back-list" onclick="goBackToList()">
+                    <i class="fas fa-list me-2"></i> К списку тестов
+                </button>
+            </div>`;
+    }
+
+    // ══════════════════════════════════
+    //  НАВИГАЦИЯ МЕЖДУ VIEWS
+    // ══════════════════════════════════
+    function showView(viewId) {
+        ['listView', 'quizView', 'resultView'].forEach(id => {
+            document.getElementById(id).style.display = id === viewId ? 'block' : 'none';
+        });
+        window.scrollTo(0, 0);
+    }
+
+    function exitQuiz() {
+        history.pushState({ view: 'list' }, '', buildPageURL());
+        showView('listView');
+    }
+
+    function goBackToList() {
+        history.pushState({ view: 'list' }, '', buildPageURL());
+        showView('listView');
+    }
+
+    async function retryQuiz() {
+        if (!quiz) return;
+        answers = {};
+        currentQ = 0;
+        history.replaceState({ view: 'quiz', quizId: quiz.id }, '', `/tests/${quiz.id}/`);
+        renderQuizUI();
+        showView('quizView');
+    }
+
+    // ══════════════════════════════════
+    //  УТИЛИТЫ
+    // ══════════════════════════════════
+    function esc(text) {
+        const d = document.createElement('div');
+        d.textContent = String(text || '');
+        return d.innerHTML;
+    }
+
+    function getCSRFToken() {
+        return document.cookie.split(';')
+            .find(c => c.trim().startsWith('csrftoken='))
+            ?.split('=')[1] || '';
+    }
+
+    // ══════════════════════════════════
+    //  POPSTATE (кнопка "назад")
+    // ══════════════════════════════════
+    window.addEventListener('popstate', e => {
+        const state = e.state;
+        if (!state) { showView('listView'); return; }
+        if (state.view === 'quiz' && state.quizId) {
+            if (quiz && quiz.id === state.quizId) {
+                renderQuizUI();
+                showView('quizView');
+            } else {
+                startQuiz(state.quizId);
+            }
+        } else if (state.view === 'result') {
+            // результат уже не восстановить без повторной отправки — просто список
+            showView('listView');
+        } else {
+            showView('listView');
+        }
+    });
+
+    // ══════════════════════════════════
+    //  ИНИЦИАЛИЗАЦИЯ
+    // ══════════════════════════════════
+    function initFiltersFromURL() {
+        const p = new URLSearchParams(window.location.search);
+        ['type', 'difficulty'].forEach(key => {
+            const val = p.get(key);
+            if (val) {
+                activeFilters[key] = val.split(',');
+                val.split(',').forEach(v => {
+                    const cb = document.querySelector(`input[name="${key}"][value="${v}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+        });
+        const search = p.get('search');
+        if (search) {
+            activeFilters.search = search;
+            document.getElementById('searchInput').value = search;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initFiltersFromURL();
+
+        const path = window.location.pathname;
+        const matchQuiz = path.match(/\/tests\/(\d+)\/?$/);
+
+        if (matchQuiz) {
+            fetchQuizzes(); // список в фоне
+            startQuiz(matchQuiz[1]);
+        } else {
+            fetchQuizzes();
+        }
+    });
+    </script>
+</body>
+</html>

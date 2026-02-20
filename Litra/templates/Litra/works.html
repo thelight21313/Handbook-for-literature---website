@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Произведения | Литературный справочник</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #2F4F2F;
+            --accent-color: #DAA520;
+            --background-light: #FAF6F1;
+            --text-dark: #2C1810;
+            --text-muted: #6B5D54;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--background-light);
+            padding-top: 80px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.8rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-dark) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 0;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Filters Sidebar */
+        .filters-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 100px;
+        }
+
+        .filter-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group {
+            margin-bottom: 25px;
+        }
+
+        .filter-group h6 {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        .filter-group h6:hover {
+            color: var(--primary-color);
+        }
+
+        .filter-group h6 i {
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .filter-group h6.collapsed i {
+            transform: rotate(-90deg);
+        }
+
+        .filter-options {
+            max-height: 500px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .filter-options.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .filter-option:hover {
+            background: var(--background-light);
+        }
+
+        .filter-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: var(--accent-color);
+        }
+
+        .filter-option label {
+            cursor: pointer;
+            margin: 0;
+            flex: 1;
+            color: var(--text-dark);
+        }
+
+        .filter-count {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .btn-reset-filters {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset-filters:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Writers Grid */
+        .writers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .work-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            border: 1px solid rgba(139, 69, 19, 0.1);
+        }
+
+        .work-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(139, 69, 19, 0.15);
+        }
+
+        .work-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .work-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .work-image-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 120%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+        }
+
+        .work-image-frame {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 4px solid;
+            border-image: linear-gradient(135deg, var(--primary-color), var(--accent-color)) 1;
+            box-shadow:
+                inset 0 0 20px rgba(0,0,0,0.1),
+                0 5px 15px rgba(0,0,0,0.2);
+            overflow: hidden;
+            background: white;
+        }
+
+        .work-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            filter: sepia(0.2) contrast(1.1);
+        }
+
+        .work-card:hover .work-image {
+            transform: scale(1.08);
+        }
+
+        /* Vintage Photo Effect */
+        .work-image-frame::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(0,0,0,0.1) 100%),
+                radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.2) 100%);
+            pointer-events: none;
+        }
+
+        .btn-favorite {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .btn-favorite:hover {
+            background: white;
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        .btn-favorite i {
+            font-size: 18px;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .btn-favorite:hover i {
+            color: #dc3545;
+        }
+
+        .btn-favorite.active i {
+            color: #dc3545;
+        }
+
+        .work-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            padding: 30px 20px 20px;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .work-card:hover .work-overlay {
+            transform: translateY(0);
+        }
+
+        .work-overlay-content {
+            color: white;
+            text-align: center;
+        }
+
+        .work-overlay-content i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .work-overlay-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .work-content {
+            padding: 25px;
+        }
+
+        .work-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            line-height: 1.3;
+        }
+
+        .work-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .work-author,
+        .work-year {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .work-author i,
+        .work-year i {
+            color: var(--accent-color);
+            font-size: 0.85rem;
+        }
+
+        .work-years {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .work-years i {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+
+        .work-genre {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.1), rgba(218, 165, 32, 0.15));
+            color: var(--primary-color);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(139, 69, 19, 0.2);
+        }
+
+        .work-description {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            margin-bottom: 30px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid rgba(139, 69, 19, 0.2);
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 5px 20px rgba(218, 165, 32, 0.2);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-color);
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-color);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+        }
+
+        .stats-info {
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+
+        .stats-info strong {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .sort-select {
+            padding: 10px 15px;
+            border: 2px solid rgba(139, 69, 19, 0.2);
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Fade in animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 10000;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid #28a745;
+        }
+
+        .notification.error {
+            border-left: 4px solid #dc3545;
+        }
+
+        .notification.info {
+            border-left: 4px solid var(--accent-color);
+        }
+
+        /* Admin Floating Button */
+        .admin-add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            box-shadow: 0 10px 30px rgba(139, 69, 19, 0.4);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            animation: pulse 2s infinite;
+        }
+
+        .admin-add-btn i {
+            font-size: 1.5rem;
+            margin-bottom: 2px;
+        }
+
+        .admin-add-btn span {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .admin-add-btn:hover {
+            transform: scale(1.15) rotate(90deg);
+            box-shadow: 0 15px 40px rgba(139, 69, 19, 0.5);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(139, 69, 19, 0.4);
+            }
+            50% {
+                box-shadow: 0 10px 40px rgba(218, 165, 32, 0.6);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .filters-section {
+                position: static;
+                margin-bottom: 30px;
+            }
+
+            .writers-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .writers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .admin-add-btn {
+                width: 55px;
+                height: 55px;
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .admin-add-btn i {
+                font-size: 1.2rem;
+            }
+
+            .admin-add-btn span {
+                font-size: 0.55rem;
+            }
+        }
+
+        /* Detail View Styles */
+        #detailView {
+            width: 100%;
+        }
+
+        #listView {
+            width: 100%;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .back-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .work-detail-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .work-detail-header {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .work-detail-image {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 8px solid white;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .work-detail-body {
+            padding: 50px;
+        }
+
+        .work-detail-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .work-detail-meta {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .work-detail-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .work-detail-meta-item i {
+            color: var(--accent-color);
+            font-size: 1.3rem;
+        }
+
+        .work-detail-quote {
+            background: var(--background-light);
+            border-left: 4px solid var(--accent-color);
+            padding: 30px;
+            margin: 30px 0;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--text-dark);
+            border-radius: 10px;
+        }
+
+        .work-detail-biography {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            text-align: justify;
+        }
+
+        .work-detail-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin: 40px 0 20px 0;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-book-open me-2" style="color: var(--accent-color);"></i>
+                ЛитСправочник
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'writers' %}">Писатели</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'works' %}">Произведения</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'tests' %}">Тесты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'facts' %}">Интересные факты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'ai_assistant' %}">AI-ассистент</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        <!-- LIST VIEW -->
+        <div id="listView" style="display: block;">
+            <!-- Page Header -->
+            <div class="page-header" data-aos="fade-down">
+                <h1>Великие русские произведения</h1>
+                <p>
+                    Откройте для себя шедевры русской литературы
+                </p>
+            </div>
+
+        <div class="row">
+            <!-- Filters Sidebar -->
+            <div class="col-lg-3">
+                <div class="filters-section" data-aos="fade-right">
+                    <div class="filter-title">
+                        <i class="fas fa-filter"></i>
+                        Фильтры
+                    </div>
+
+                    <!-- Период -->
+                    <div class="filter-group">
+                        <h6 onclick="toggleFilterGroup(this)">
+                            Период
+                            <i class="fas fa-chevron-down"></i>
+                        </h6>
+                        <div class="filter-options">
+                            <div class="filter-option">
+                                <input type="checkbox" id="period-17" name="period" value="17">
+                                <label for="period-17">XVII век</label>
+                                <span class="filter-count">(2)</span>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="period-18" name="period" value="18">
+                                <label for="period-18">XVIII век</label>
+                                <span class="filter-count">(5)</span>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="period-19" name="period" value="19">
+                                <label for="period-19">XIX век</label>
+                                <span class="filter-count">(32)</span>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="period-20" name="period" value="20">
+                                <label for="period-20">XX век</label>
+                                <span class="filter-count">(28)</span>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="period-21" name="period" value="21">
+                                <label for="period-21">XXI век</label>
+                                <span class="filter-count">(3)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Жанр -->
+                    <div class="filter-group">
+                        <h6 onclick="toggleFilterGroup(this)">
+                            Жанр
+                            <i class="fas fa-chevron-down"></i>
+                        </h6>
+                        <div class="filter-options">
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-novel" name="genre" value="Роман">
+                                <label for="genre-novel">Роман</label>
+                                <span class="filter-count">(45)</span>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-story" name="genre" value="Повесть">
+                                <label for="genre-story">Повесть</label>
+                                <span class="filter-count">(38)</span>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-poem" name="genre" value="Поэма">
+                                <label for="genre-poem">Поэма</label>
+                                <span class="filter-count">(22)</span>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-poetry" name="genre" value="Стихотворение">
+                                <label for="genre-poetry">Стихотворение</label>
+                                <span class="filter-count">(67)</span>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-play" name="genre" value="Пьеса">
+                                <label for="genre-play">Пьеса</label>
+                                <span class="filter-count">(18)</span>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-short-story" name="genre" value="Рассказ">
+                                <label for="genre-short-story">Рассказ</label>
+                                <span class="filter-count">(52)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Избранное -->
+                    <div class="filter-group">
+                        <h6 onclick="toggleFilterGroup(this)">
+                            Дополнительно
+                            <i class="fas fa-chevron-down"></i>
+                        </h6>
+                        <div class="filter-options">
+                            <div class="filter-option">
+                                <input type="checkbox" id="favorites-only" name="favorites" value="true">
+                                <label for="favorites-only">Только избранное</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-reset-filters" onclick="resetFilters()">
+                        <i class="fas fa-redo me-2"></i>
+                        Сбросить фильтры
+                    </button>
+                </div>
+            </div>
+
+            <!-- Writers Grid -->
+            <div class="col-lg-9">
+                <!-- Search Bar -->
+                <div class="search-bar" data-aos="fade-left">
+                    <div class="search-input-wrapper">
+                        <input type="text"
+                               class="search-input"
+                               placeholder="Поиск произведения по названию..."
+                               id="searchInput"
+                               onkeyup="filterWriters()">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="stats-bar" data-aos="fade-up">
+                    <select class="sort-select" onchange="sortWriters(this.value)">
+                        <option value="name">По имени (А-Я)</option>
+                        <option value="name-desc">По имени (Я-А)</option>
+                        <option value="year">По году рождения</option>
+                        <option value="year-desc">По году рождения (новые)</option>
+                    </select>
+                </div>
+
+                <!-- Writers Grid -->
+                <div class="writers-grid" id="worksGrid">
+                    <!-- Content will be loaded dynamically via JavaScript -->
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- END LIST VIEW -->
+
+        <!-- DETAIL VIEW -->
+        <div id="detailView" style="display: none; background: #fff; padding: 20px;">
+            <button class="back-button" onclick="goBackToList()">
+                <i class="fas fa-arrow-left"></i>
+                Вернуться к списку
+            </button>
+
+            <div class="work-detail-card" id="workDetailCard">
+                <h1 style="color: red; font-size: 48px;">ТЕСТ - Если видишь это, значит detail view работает!</h1>
+            </div>
+        </div>
+        <!-- END DETAIL VIEW -->
+    </div>
+
+    <!-- Admin Floating Button (visible only for admins) -->
+    {% if user.is_staff or user.is_superuser  or is_seller%}
+    <a href="{% url 'create_work' %}" class="admin-add-btn" title="Добавить произведения">
+        <i class="fas fa-user-plus"></i>
+        <span>Книга</span>
+    </a>
+    {% endif %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        console.log('=== WORKS.HTML SCRIPT LOADED ===');
+
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        console.log('AOS initialized');
+
+        // Toggle filter group collapse/expand
+        function toggleFilterGroup(header) {
+            const filterOptions = header.nextElementSibling;
+            const icon = header.querySelector('i');
+
+            // Toggle collapsed class
+            header.classList.toggle('collapsed');
+            filterOptions.classList.toggle('collapsed');
+        }
+
+        // Navigate to writer detail page
+        function goToWork(writerId) {
+            // Change URL without reload
+            history.pushState({ view: 'detail', writerId: writerId }, '', `/works/${writerId}/`);
+
+            // Load and show detail view
+            loadWorkDetail(writerId);
+        }
+
+        // Go back to list view
+        function goBackToList() {
+            // Change URL back to list
+            const url = buildFilterURL().replace('/api/works/', '/works/');
+            history.pushState({ view: 'list' }, '', url);
+
+            // Show list view
+            showListView();
+        }
+
+        // Load writer detail from API
+        async function loadWorkDetail(writerId) {
+            try {
+                const response = await fetch(`/api/works/${writerId}/`);
+
+                if (response.ok) {
+                    const writer = await response.json();
+                    displayWorkDetail(writer);
+                    showDetailView();
+                } else {
+                    showNotification('Произведение не найден', 'error');
+                    goBackToList();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки произведения:', error);
+                showNotification('Ошибка соединения с сервером', 'error');
+            }
+        }
+
+        // Display writer detail
+        function displayWorkDetail(work) {
+            const detailCard = document.getElementById('workDetailCard');
+
+            // Форматируем описание с сохранением переносов строк
+            const formattedDescription = work.description
+                ? escapeHtml(work.description).replace(/\n/g, '<br>')
+                : 'Описание пока не добавлено.';
+
+            detailCard.innerHTML = `
+                <div class="work-detail-header">
+                    <img src="${work.cover_image || 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400'}"
+                         alt="${escapeHtml(work.title)}"
+                         class="work-detail-image">
+                </div>
+
+                <div class="work-detail-body">
+                    <h1 class="work-detail-title">${escapeHtml(work.title)}</h1>
+
+                    <div class="work-detail-meta">
+                        <div class="work-detail-meta-item">
+                            <i class="fas fa-user"></i>
+                            <span>${escapeHtml(work.author_name || 'Автор неизвестен')}</span>
+                        </div>
+                        <div class="work-detail-meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>${work.publication_year || '...'}</span>
+                        </div>
+                        <div class="work-detail-meta-item">
+                            <i class="fas fa-bookmark"></i>
+                            <span>${escapeHtml(work.genre || 'Жанр')}</span>
+                        </div>
+                        <div class="work-detail-meta-item">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>${work.period} век</span>
+                        </div>
+                    </div>
+
+                    <h2 class="work-detail-section-title">
+                        <i class="fas fa-book-open"></i> Описание
+                    </h2>
+                    <div class="work-detail-biography">
+                        ${formattedDescription}
+                    </div>
+                </div>
+            `;
+
+            console.log('Work detail displayed:', work.title);
+        }
+
+        // Show detail view
+        function showDetailView() {
+            console.log('=== SHOWING DETAIL VIEW ===');
+            const listView = document.getElementById('listView');
+            const detailView = document.getElementById('detailView');
+
+            if (!listView || !detailView) {
+                console.error('ERROR: Elements not found!', { listView, detailView });
+                return;
+            }
+
+            listView.style.display = 'none';
+            detailView.style.display = 'block';
+
+            console.log('After change:', {
+                listView: listView.style.display,
+                detailView: detailView.style.display
+            });
+
+            window.scrollTo(0, 0);
+        }
+
+        // Show list view
+        function showListView() {
+            console.log('=== SHOWING LIST VIEW ===');
+            const listView = document.getElementById('listView');
+            const detailView = document.getElementById('detailView');
+
+            if (!listView || !detailView) {
+                console.error('ERROR: Elements not found!', { listView, detailView });
+                return;
+            }
+
+            listView.style.display = 'block';
+            detailView.style.display = 'none';
+
+            console.log('After change:', {
+                listView: listView.style.display,
+                detailView: detailView.style.display
+            });
+
+            window.scrollTo(0, 0);
+        }
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', function(event) {
+            if (event.state) {
+                if (event.state.view === 'detail' && event.state.writerId) {
+                    loadWorkDetail(event.state.writerId);
+                } else if (event.state.view === 'list') {
+                    // Restore filters from state
+                    if (event.state.period) activeFilters.period = event.state.period;
+                    if (event.state.genre) activeFilters.genre = event.state.genre;
+                    if (event.state.favorites !== undefined) activeFilters.favorites = event.state.favorites;
+
+                    showListView();
+                    updateURLAndFetch();
+                }
+            } else {
+                // No state - go to list view
+                showListView();
+            }
+        });
+
+        // Check initial URL on page load
+        function checkInitialRoute() {
+            const path = window.location.pathname;
+            console.log('Checking initial route:', path);
+
+            const match = path.match(/\/works\/(\d+)\/?$/);
+
+            if (match) {
+                // URL is /works/123/ - show detail view
+                const workId = match[1];
+                console.log('Detail route detected, loading work:', workId);
+                loadWorkDetail(workId);
+            } else {
+                // URL is /works/ - show list view
+                console.log('List route detected');
+                showListView();
+            }
+        }
+
+        // Get CSRF Token
+        function getCSRFToken() {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+            return cookieValue || '';
+        }
+
+        // Show Notification
+        function showNotification(message, type = 'info') {
+            const oldNotification = document.querySelector('.notification');
+            if (oldNotification) oldNotification.remove();
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.classList.add('show'), 10);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Handle Favorite
+        async function handleFavorite(workId) {
+            const button = document.querySelector(`.favorite-btn-${workId}`);
+            const icon = button.querySelector('i');
+            const originalClass = icon.className;
+            const card = button.closest('.work-card');
+
+            try {
+                icon.className = 'fas fa-spinner fa-spin';
+                button.disabled = true;
+
+                const response = await fetch(`/api/works/${workId}/favorite/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        work_id: workId
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    if (result.is_favorite) {
+                        button.classList.add('active');
+                        icon.className = 'fas fa-heart';
+                        card.dataset.isFavorite = 'true';
+                        showNotification('Добавлено в избранное', 'success');
+                    } else {
+                        button.classList.remove('active');
+                        icon.className = 'far fa-heart';
+                        card.dataset.isFavorite = 'false';
+                        showNotification('Удалено из избранного', 'info');
+                    }
+
+                    // Применяем фильтры заново, если активен фильтр "только избранное"
+                    const favoritesOnly = document.querySelector('input[name="favorites"]:checked');
+                    if (favoritesOnly) {
+                        updateURLAndFetch();
+                    }
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || 'Ошибка выполнения', 'error');
+                    icon.className = originalClass;
+                }
+            } catch (error) {
+                console.error('Ошибка сети:', error);
+                showNotification('Ошибка соединения с сервером', 'error');
+                icon.className = originalClass;
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        // Filter Writers (поиск через API)
+        let searchTimeout;
+        function filterWriters() {
+            // Debounce для поиска
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                const searchValue = document.getElementById('searchInput').value.trim();
+
+                try {
+                    const response = await fetch('/api/works/filter/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
+                        },
+                        body: JSON.stringify({
+                            action: 'search',
+                            search_query: searchValue,
+                            active_filters: activeFilters
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        updateWorksDisplay(result.works);
+                        document.getElementById('worksCount').textContent = result.works.length;
+                    }
+                } catch (error) {
+                    console.error('Ошибка поиска:', error);
+                }
+            }, 300); // Задержка 300мс перед отправкой запроса
+        }
+
+        // Sort Writers
+        function sortWriters(sortBy) {
+            const grid = document.getElementById('worksGrid');
+            const cards = Array.from(document.querySelectorAll('.work-card'));
+
+            cards.sort((a, b) => {
+                const nameA = a.querySelector('.work-name').textContent;
+                const nameB = b.querySelector('.work-name').textContent;
+                const yearsA = a.querySelector('.work-years span').textContent;
+                const yearsB = b.querySelector('.work-years span').textContent;
+                const yearA = parseInt(yearsA.split(' - ')[0]);
+                const yearB = parseInt(yearsB.split(' - ')[0]);
+
+                switch(sortBy) {
+                    case 'name':
+                        return nameA.localeCompare(nameB, 'ru');
+                    case 'name-desc':
+                        return nameB.localeCompare(nameA, 'ru');
+                    case 'year':
+                        return yearA - yearB;
+                    case 'year-desc':
+                        return yearB - yearA;
+                    default:
+                        return 0;
+                }
+            });
+
+            grid.innerHTML = '';
+            cards.forEach(card => grid.appendChild(card));
+        }
+
+        // Reset Filters
+        async function resetFilters() {
+            // Сбрасываем все чекбоксы
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('searchInput').value = '';
+
+            // Очищаем активные фильтры
+            activeFilters = {
+                period: [],
+                genre: [],
+                favorites: false
+            };
+
+            // Обновляем URL и загружаем данные
+            updateURLAndFetch();
+            showNotification('Фильтры сброшены', 'info');
+        }
+
+        // Хранилище текущих активных фильтров
+        let activeFilters = {
+            period: [],
+            genre: [],
+            favorites: false
+        };
+
+        // Filter by checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                handleFilterChange(this);
+            });
+        });
+
+        // Обработка изменения фильтра
+        async function handleFilterChange(checkbox) {
+            const filterGroup = checkbox.name; // 'period', 'genre', 'favorites'
+            const filterValue = checkbox.value;
+            const isChecked = checkbox.checked;
+
+            // Обновляем локальное хранилище активных фильтров
+            if (filterGroup === 'favorites') {
+                activeFilters.favorites = isChecked;
+            } else {
+                // Обновляем массив фильтров
+                if (isChecked) {
+                    if (!activeFilters[filterGroup].includes(filterValue)) {
+                        activeFilters[filterGroup].push(filterValue);
+                    }
+                } else {
+                    activeFilters[filterGroup] = activeFilters[filterGroup].filter(v => v !== filterValue);
+                }
+            }
+
+            // Обновляем URL и загружаем данные
+            updateURLAndFetch();
+        }
+
+        // Построение URL с параметрами фильтров
+        function buildFilterURL() {
+            const params = new URLSearchParams();
+
+            // Добавляем периоды через запятую
+            if (activeFilters.period.length > 0) {
+                params.append('period', activeFilters.period.join(','));
+            }
+
+            // Добавляем жанры через запятую
+            if (activeFilters.genre.length > 0) {
+                params.append('genre', activeFilters.genre.join(','));
+            }
+
+            // Добавляем избранное
+            if (activeFilters.favorites) {
+                params.append('favorites', 'true');
+            }
+
+            // Добавляем поиск если есть
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput && searchInput.value.trim()) {
+                params.append('search', searchInput.value.trim());
+            }
+
+            return '/api/works/?' + params.toString();
+        }
+
+        // Обновление URL и загрузка данных
+        async function updateURLAndFetch() {
+            const url = buildFilterURL();
+
+            // Обновляем URL в адресной строке (для истории и шаринга)
+            const urlWithoutApi = url.replace('/api/works/', '/works/');
+
+            // Save state with view type
+            const state = {
+                view: 'list',
+                period: activeFilters.period,
+                genre: activeFilters.genre,
+                favorites: activeFilters.favorites
+            };
+            history.pushState(state, '', urlWithoutApi);
+
+            // Загружаем данные
+            try {
+                const response = await fetch(url);
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // Обновляем отображение произведений
+                    updateWorksDisplay(result.works);
+
+                    // Обновляем счетчик (только если элемент существует)
+                    const countElement = document.getElementById('worksCount');
+                    if (countElement) {
+                        countElement.textContent = result.works.length;
+                    }
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || 'Ошибка загрузки данных', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка API:', error);
+                showNotification('Ошибка соединения с сервером', 'error');
+            }
+        }
+
+        // Инициализация фильтров из URL при загрузке страницы
+        function initFiltersFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Восстанавливаем периоды (парсим через запятую)
+            const periodsParam = urlParams.get('period');
+            if (periodsParam) {
+                const periods = periodsParam.split(',');
+                activeFilters.period = periods;
+                periods.forEach(p => {
+                    const checkbox = document.querySelector(`input[name="period"][value="${p}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            // Восстанавливаем жанры (парсим через запятую)
+            const genresParam = urlParams.get('genre');
+            if (genresParam) {
+                const genres = genresParam.split(',');
+                activeFilters.genre = genres;
+                genres.forEach(g => {
+                    const checkbox = document.querySelector(`input[name="genre"][value="${g}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            // Восстанавливаем избранное
+            if (urlParams.get('favorites') === 'true') {
+                activeFilters.favorites = true;
+                const checkbox = document.querySelector('input[name="favorites"]');
+                if (checkbox) checkbox.checked = true;
+            }
+
+            // Восстанавливаем поиск
+            const search = urlParams.get('search');
+            if (search) {
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) searchInput.value = search;
+            }
+
+            // ВСЕГДА загружаем данные при загрузке страницы
+            // Либо с фильтрами из URL, либо все произведения
+            updateURLAndFetch();
+        }
+
+        // Обработка кнопки "назад" в браузере
+        window.addEventListener('popstate', function(event) {
+            if (event.state) {
+                activeFilters = event.state;
+                // Обновляем чекбоксы на основе состояния
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                activeFilters.period.forEach(c => {
+                    const checkbox = document.querySelector(`input[name="period"][value="${c}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+
+                activeFilters.genre.forEach(g => {
+                    const checkbox = document.querySelector(`input[name="genre"][value="${g}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+
+                if (activeFilters.favorites) {
+                    const checkbox = document.querySelector('input[name="favorites"]');
+                    if (checkbox) checkbox.checked = true;
+                }
+
+                updateURLAndFetch();
+            }
+        });
+
+        // Обновление отображения произведений на странице
+        function updateWorksDisplay(works) {
+            const grid = document.getElementById('worksGrid');
+
+            if (!works || works.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>Произведения не найдены</h3>
+                        <p>Попробуйте изменить параметры фильтрации</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = '';
+
+            works.forEach((work, index) => {
+                const card = document.createElement('div');
+                card.className = 'work-card fade-in';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.dataset.workId = work.id;
+                card.dataset.period = work.period;
+                card.dataset.genre = work.genre.toLowerCase();
+                card.dataset.isFavorite = work.is_favorite ? 'true' : 'false';
+
+                card.innerHTML = `
+                    <div class="work-image-wrapper" onclick="goToWork(${work.id})">
+                        <div class="work-image-frame">
+                            <img src="${work.cover_image || 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400'}"
+                                 alt="${escapeHtml(work.title)}"
+                                 class="work-image">
+                        </div>
+
+                        <button type="button"
+                                onclick="event.stopPropagation(); handleFavorite(${work.id})"
+                                class="btn-favorite favorite-btn-${work.id} ${work.is_favorite ? 'active' : ''}"
+                                title="Добавить в избранное">
+                            <i class="${work.is_favorite ? 'fas' : 'far'} fa-heart"></i>
+                        </button>
+
+                        <div class="work-overlay">
+                            <div class="work-overlay-content">
+                                <i class="fas fa-book-open"></i>
+                                <p>Читать подробнее</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="work-content">
+                        <h3 class="work-name">${escapeHtml(work.title)}</h3>
+                        <div class="work-meta">
+                            <div class="work-author">
+                                <i class="fas fa-user"></i>
+                                <span>${escapeHtml(work.author_name || 'Автор')}</span>
+                            </div>
+                            <div class="work-year">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>${work.publication_year || '...'}</span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <span class="work-genre">${escapeHtml(work.genre || 'Произведение')}</span>
+                        </div>
+                        ${work.description ? `
+                        <div class="work-description">
+                            "${escapeHtml(work.description.substring(0, 100))}${work.description.length > 100 ? '...' : ''}"
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Escape HTML для безопасности
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initial animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we should show detail or list view
+            checkInitialRoute();
+
+            // Инициализируем фильтры из URL ТОЛЬКО для list view
+            const path = window.location.pathname;
+            const isDetailPage = path.match(/\/works\/\d+\/?$/);
+
+            if (!isDetailPage) {
+                // Это страница списка - загружаем список
+                initFiltersFromURL();
+            }
+            // Если это detail page, checkInitialRoute() уже загрузит данные произведения
+
+            const cards = document.querySelectorAll('.work-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('fade-in');
+                }, index * 50);
+            });
+        });
+    </script>
+</body>
+</html>

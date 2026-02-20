@@ -1,0 +1,5 @@
+Django~=4.2.27
+djangorestframework==3.16.1
+psycopg2==2.9.11
+gunicorn==23.0.0
+django-filter~=25.1

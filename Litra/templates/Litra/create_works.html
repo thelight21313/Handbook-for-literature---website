@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить произведение | Литературный справочник</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #2F4F2F;
+            --accent-color: #DAA520;
+            --background-light: #FAF6F1;
+            --text-dark: #2C1810;
+            --text-muted: #6B5D54;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--background-light) 0%, #E8DFD6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Decorative Background Elements */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(218, 165, 32, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 69, 19, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 25px;
+            padding: 50px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow:
+                0 20px 60px rgba(139, 69, 19, 0.15),
+                0 0 0 1px rgba(139, 69, 19, 0.05);
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .form-header::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .form-header h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .form-header .icon-wrapper {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(139, 69, 19, 0.3);
+        }
+
+        .form-header .icon-wrapper i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(218, 165, 32, 0.1), rgba(139, 69, 19, 0.05));
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .info-box p {
+            margin: 0;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .info-box strong {
+            color: var(--primary-color);
+        }
+
+        .info-box i {
+            color: var(--accent-color);
+            margin-right: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group label i {
+            color: var(--accent-color);
+            margin-right: 8px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .required {
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid rgba(139, 69, 19, 0.15);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            background: white;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.1);
+            background: var(--background-light);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B4513' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            padding-right: 45px;
+        }
+
+        .field-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .field-info i {
+            color: var(--accent-color);
+            font-size: 0.8rem;
+        }
+
+        /* Image Preview */
+        .preview-section {
+            margin-top: 15px;
+            text-align: center;
+            padding: 20px;
+            background: var(--background-light);
+            border-radius: 12px;
+            border: 2px dashed rgba(139, 69, 19, 0.2);
+        }
+
+        .preview-frame {
+            position: relative;
+            display: inline-block;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        .preview-border {
+            padding: 10px;
+            background: white;
+            border: 4px solid;
+            border-image: linear-gradient(135deg, var(--primary-color), var(--accent-color)) 1;
+            box-shadow:
+                inset 0 0 20px rgba(0,0,0,0.05),
+                0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .preview-section img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .no-preview {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding: 40px 20px;
+        }
+
+        .no-preview i {
+            font-size: 3rem;
+            color: rgba(139, 69, 19, 0.2);
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(139, 69, 19, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(139, 69, 19, 0.4);
+        }
+
+        .submit-btn i {
+            margin-right: 10px;
+        }
+
+        /* Back Link */
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        /* Genre Section */
+        .genre-section {
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.03), rgba(218, 165, 32, 0.05));
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(139, 69, 19, 0.1);
+        }
+
+        .genre-section h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .genre-section h3 i {
+            color: var(--accent-color);
+        }
+
+        /* Two column layout for period and year */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 30px 25px;
+            }
+
+            .form-header h2 {
+                font-size: 2rem;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <div class="icon-wrapper">
+                <i class="fas fa-book"></i>
+            </div>
+            <h2>Добавить произведение</h2>
+            <p>Заполните информацию о новом произведении</p>
+        </div>
+
+        <div class="info-box">
+            <p><i class="fas fa-info-circle"></i> <strong>ID произведения будет сгенерирован автоматически!</strong></p>
+            <p style="margin-top: 8px; font-size: 0.9rem;">Система присвоит уникальный идентификатор при сохранении</p>
+        </div>
+
+        <form method="post" id="workForm">
+            {% csrf_token %}
+
+            <!-- Title -->
+            <div class="form-group">
+                <label for="title">
+                    <i class="fas fa-heading"></i>
+                    Название произведения <span class="required">*</span>
+                </label>
+                <input type="text"
+                       id="title"
+                       name="title"
+                       required
+                       placeholder="Например: Евгений Онегин">
+                <div class="field-info">
+                    <i class="fas fa-lightbulb"></i>
+                    Полное название произведения
+                </div>
+            </div>
+
+            <!-- Author -->
+            <div class="form-group">
+                <label for="author_name">
+                    <i class="fas fa-user-edit"></i>
+                    Автор <span class="required">*</span>
+                </label>
+                <select id="author_name" name="author_name" required>
+                    <option value="">Выберите автора</option>
+                    {% for writer in writers %}
+                    <option value="{{ writer.id }}">{{ writer.full_name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="field-info">
+                    <i class="fas fa-info-circle"></i>
+                    Выберите автора из списка
+                </div>
+            </div>
+
+            <!-- Period and Publication Year -->
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="period">
+                        <i class="fas fa-clock"></i>
+                        Период <span class="required">*</span>
+                    </label>
+                    <select id="period" name="period" required>
+                        <option value="">Выберите век</option>
+                        <option value="17">XVII век</option>
+                        <option value="18">XVIII век</option>
+                        <option value="19">XIX век</option>
+                        <option value="20">XX век</option>
+                        <option value="21">XXI век</option>
+                    </select>
+                    <div class="field-info">
+                        <i class="fas fa-info-circle"></i>
+                        Век создания
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="publication_year">
+                        <i class="fas fa-calendar-alt"></i>
+                        Год публикации <span class="required">*</span>
+                    </label>
+                    <input type="number"
+                           id="publication_year"
+                           name="publication_year"
+                           required
+                           min="1600"
+                           max="2026"
+                           placeholder="1833">
+                    <div class="field-info">
+                        <i class="fas fa-info-circle"></i>
+                        1600-2026
+                    </div>
+                </div>
+            </div>
+
+            <!-- Genre Section -->
+            <div class="genre-section">
+                <h3>
+                    <i class="fas fa-masks-theater"></i>
+                    Литературный жанр <span class="required">*</span>
+                </h3>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <select id="genre" name="genre" required>
+                        <option value="">Выберите жанр</option>
+                        <option value="Роман">Роман</option>
+                        <option value="Повесть">Повесть</option>
+                        <option value="Поэма">Поэма</option>
+                        <option value="Стихотворение">Стихотворение</option>
+                        <option value="Пьеса">Пьеса</option>
+                        <option value="Рассказ">Рассказ</option>
+                        <option value="Басня">Басня</option>
+                        <option value="Очерк">Очерк</option>
+                    </select>
+                    <div class="field-info">
+                        <i class="fas fa-info-circle"></i>
+                        Жанр произведения
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label for="description">
+                    <i class="fas fa-align-left"></i>
+                    Описание <span class="required">*</span>
+                </label>
+                <textarea id="description"
+                          name="description"
+                          required
+                          placeholder="Краткое описание произведения, его сюжет и значение..."></textarea>
+                <div class="field-info">
+                    <i class="fas fa-text-height"></i>
+                    Рекомендуем 200-800 символов
+                </div>
+            </div>
+
+            <!-- Cover Image URL -->
+            <div class="form-group">
+                <label for="cover_image">
+                    <i class="fas fa-image"></i>
+                    Ссылка на обложку <span class="required">*</span>
+                </label>
+                <input type="text"
+                       id="cover_image"
+                       name="cover_image"
+                       required
+                       placeholder="https://example.com/evgeniy-onegin.jpg">
+                <div class="field-info">
+                    <i class="fas fa-info-circle"></i>
+                    Поддерживаются форматы: JPG, PNG, WebP
+                </div>
+
+                <!-- Image Preview -->
+                <div class="preview-section">
+                    <div class="preview-frame" id="preview_frame" style="display: none;">
+                        <div class="preview-border">
+                            <img id="image_preview" src="" alt="Превью обложки">
+                        </div>
+                    </div>
+                    <div class="no-preview" id="no_preview">
+                        <i class="fas fa-book-open"></i>
+                        <div>Превью обложки появится после ввода ссылки</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-plus-circle"></i>
+                Добавить произведение
+            </button>
+        </form>
+
+        <a href="{% url 'works' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Вернуться к списку произведений
+        </a>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Image Preview
+        document.getElementById('cover_image').addEventListener('input', function() {
+            const url = this.value.trim();
+            const preview = document.getElementById('image_preview');
+            const previewFrame = document.getElementById('preview_frame');
+            const noPreview = document.getElementById('no_preview');
+
+            if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                preview.src = url;
+
+                preview.onload = function() {
+                    previewFrame.style.display = 'inline-block';
+                    noPreview.style.display = 'none';
+                };
+
+                preview.onerror = function() {
+                    previewFrame.style.display = 'none';
+                    noPreview.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i><div style="color: #dc3545;">Не удалось загрузить изображение по этой ссылке</div>';
+                    noPreview.style.display = 'block';
+                };
+            } else {
+                previewFrame.style.display = 'none';
+                noPreview.innerHTML = '<i class="fas fa-book-open"></i><div>Превью обложки появится после ввода ссылки</div>';
+                noPreview.style.display = 'block';
+            }
+        });
+
+        // Auto add https:// if protocol not specified
+        document.getElementById('cover_image').addEventListener('blur', function() {
+            let url = this.value.trim();
+            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                this.value = 'https://' + url;
+                this.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // Auto-select period based on publication year
+        document.getElementById('publication_year').addEventListener('input', function() {
+            const year = parseInt(this.value);
+            const periodSelect = document.getElementById('period');
+
+            if (year >= 1600 && year <= 1699) {
+                periodSelect.value = '17';
+            } else if (year >= 1700 && year <= 1799) {
+                periodSelect.value = '18';
+            } else if (year >= 1800 && year <= 1899) {
+                periodSelect.value = '19';
+            } else if (year >= 1900 && year <= 1999) {
+                periodSelect.value = '20';
+            } else if (year >= 2000 && year <= 2099) {
+                periodSelect.value = '21';
+            }
+        });
+
+        // Validate publication year matches period
+        document.getElementById('workForm').addEventListener('submit', function(e) {
+            const year = parseInt(document.getElementById('publication_year').value);
+            const period = document.getElementById('period').value;
+
+            const expectedPeriod = Math.floor(year / 100);
+
+            if (period != expectedPeriod) {
+                if (!confirm(`Год публикации ${year} относится к ${expectedPeriod} веку, но выбран ${period} век. Продолжить?`)) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+
+        // Character counter for description
+        const descTextarea = document.getElementById('description');
+        const descInfo = descTextarea.nextElementSibling;
+
+        descTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            descInfo.innerHTML = `<i class="fas fa-text-height"></i> ${length} символов`;
+
+            if (length < 200) {
+                descInfo.style.color = '#dc3545';
+            } else if (length > 800) {
+                descInfo.style.color = '#ffc107';
+            } else {
+                descInfo.style.color = 'var(--text-muted)';
+            }
+        });
+    </script>
+</body>
+</html>
