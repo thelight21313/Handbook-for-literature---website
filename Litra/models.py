@@ -60,7 +60,7 @@ class Facts(models.Model):
     category = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='trivia')
     image_url = models.URLField()
     source = models.CharField(max_length=300, blank=True)
-    likes = models.ManyToManyField(User, related_name='likes_facts')
+    favorited_by = models.ManyToManyField(User, related_name='favorite_facts')
     views = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -97,11 +97,7 @@ class Quizz(models.Model):
     ]
 
     difficulty = models.CharField(choices=DIF_CHOICES, max_length=50)
-    times_taken = models.IntegerField(default=600)
-
-    @property
-    def question_count(self):
-        return self.questions.count()
+    times_taken = models.IntegerField(default=0)
 
 
 class Question(models.Model):

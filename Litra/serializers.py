@@ -1,4 +1,4 @@
-from .models import Writers, Works, Facts
+from .models import Writers, Works, Facts, Quizz, Question, Answer
 import django
 from rest_framework.renderers import JSONRenderer
 from rest_framework import serializers
@@ -54,8 +54,31 @@ class FactsSerializer(serializers.ModelSerializer):
 
 
 class FastTest(serializers.ModelSerializer):
-    pass
+    writer_name = serializers.CharField(source='writer.full_name', read_only=True, allow_null=True, default=None)
+    work_title = serializers.CharField(source='work.title', read_only=True, allow_null=True, default=None)
+
+    class Meta:
+        model = Quizz
+        fields = ['id', 'title', 'description', 'writer_name', 'work_title', 'difficulty', 'times_taken']
 
 
-class PropertyTest(serializers.ModelSerializer):
-    pass
+class OptionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ['id', 'text']
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    options = OptionsSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Question
+        fields = ['id', 'order', 'text', 'options']
+
+
+class PropertyTest(FastTest):
+    questions = QuestionSerializer(many=True, read_only=True)
+
+    class Meta(FastTest.Meta):
+        fields = FastTest.Meta.fields + ['questions']
+

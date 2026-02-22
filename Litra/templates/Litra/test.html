@@ -394,6 +394,17 @@
             <div class="page-header" data-aos="fade-down">
                 <h1>Тесты по литературе</h1>
                 <p>Проверьте свои знания о писателях, произведениях и эпохах русской литературы</p>
+                {% if request.user.is_staff %}
+                <a href="{% url 'quiz_create' %}" style="
+                    display: inline-flex; align-items: center; gap: 8px;
+                    margin-top: 20px; padding: 10px 24px;
+                    background: var(--primary-color); color: white;
+                    border-radius: 10px; font-weight: 600; font-size: 0.9rem;
+                    text-decoration: none; transition: background 0.3s;
+                ">
+                    <i class="fas fa-plus"></i> Создать тест
+                </a>
+                {% endif %}
             </div>
 
             <div class="row">
@@ -567,11 +578,11 @@
         if (activeFilters.type.length)       p.append('type',       activeFilters.type.join(','));
         if (activeFilters.difficulty.length) p.append('difficulty', activeFilters.difficulty.join(','));
         if (activeFilters.search)            p.append('search',     activeFilters.search);
-        return '/api/quizzes/?' + p.toString();
+        return '/api/tests/?' + p.toString();
     }
 
     function buildPageURL() {
-        return buildApiURL().replace('/api/quizzes/', '/tests/');
+        return buildApiURL().replace('/api/tests/', '/tests/');
     }
 
     // ══════════════════════════════════
@@ -625,7 +636,7 @@
                 </div>
                 <div class="quiz-footer">
                     <div class="quiz-meta">
-                        <span><i class="fas fa-list-ol"></i> ${q.questions_count} вопросов</span>
+                        <span><i class="fas fa-list-ol"></i> ${q.question_count} вопросов</span>
                         <span><i class="fas fa-users"></i> ${q.times_taken} прохождений</span>
                     </div>
                     <button class="btn-start" onclick="startQuiz(${q.id})">
@@ -641,7 +652,7 @@
     // ══════════════════════════════════
     async function startQuiz(quizId) {
         try {
-            const res = await fetch(`/api/quizzes/${quizId}/`);
+            const res = await fetch(`/api/tests/${quizId}/`);
             if (!res.ok) throw new Error();
             quiz = await res.json();
             answers = {};
@@ -778,7 +789,7 @@
         };
 
         try {
-            const res = await fetch(`/api/quizzes/${quiz.id}/submit/`, {
+            const res = await fetch(`/api/tests/${quiz.id}/submit/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

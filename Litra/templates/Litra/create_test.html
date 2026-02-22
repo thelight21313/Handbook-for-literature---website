@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать тест | Литературный справочник</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --accent-color: #DAA520;
+            --background-light: #FAF6F1;
+            --text-dark: #2C1810;
+            --text-muted: #6B5D54;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--background-light);
+            padding-top: 80px;
+        }
+        .navbar {
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700; color: var(--primary-color) !important; font-size: 1.8rem;
+        }
+        .nav-link { font-weight: 500; color: var(--text-dark) !important; transition: color 0.3s; }
+        .nav-link:hover { color: var(--primary-color) !important; }
+
+        .page-wrap { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+
+        .page-header { margin-bottom: 36px; }
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem; color: var(--primary-color); font-weight: 700;
+        }
+        .page-header p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+
+        /* ── СЕКЦИИ ── */
+        .section-card {
+            background: white; border-radius: 16px; padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem; color: var(--primary-color);
+            margin-bottom: 24px; font-weight: 600;
+            padding-bottom: 12px; border-bottom: 1px solid rgba(139,69,19,0.1);
+        }
+
+        /* ── ПОЛЯ ── */
+        label {
+            font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
+            display: block;
+        }
+        .form-control, .form-select {
+            border: 2px solid rgba(139,69,19,0.15); border-radius: 10px;
+            font-family: 'Montserrat', sans-serif; font-size: 0.9rem;
+            padding: 10px 14px; transition: border-color 0.2s;
+            background: white; color: var(--text-dark);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color); outline: none;
+            box-shadow: 0 0 0 4px rgba(218,165,32,0.1);
+        }
+        .form-control.is-invalid { border-color: #dc3545; }
+
+        /* ── ВОПРОСЫ ── */
+        .question-block {
+            border: 2px solid rgba(139,69,19,0.1);
+            border-radius: 14px; padding: 24px;
+            margin-bottom: 20px; position: relative;
+            transition: border-color 0.2s;
+        }
+        .question-block:focus-within { border-color: rgba(139,69,19,0.25); }
+        .question-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .question-num {
+            font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--accent-color);
+        }
+        .btn-remove-question {
+            background: none; border: none; color: #dc3545;
+            font-size: 0.8rem; cursor: pointer; padding: 4px 8px;
+            border-radius: 6px; transition: background 0.2s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .btn-remove-question:hover { background: #fff5f5; }
+
+        /* ── ВАРИАНТЫ ОТВЕТОВ ── */
+        .options-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+        .option-row {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .option-radio-wrap {
+            display: flex; align-items: center; gap: 6px;
+            flex-shrink: 0; font-size: 0.78rem; color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .option-radio-wrap input[type="radio"] {
+            width: 16px; height: 16px; accent-color: #28a745; cursor: pointer;
+        }
+        .option-row .form-control { flex: 1; }
+        .btn-remove-option {
+            background: none; border: none; color: #dc3545;
+            font-size: 0.85rem; cursor: pointer; padding: 6px;
+            border-radius: 6px; transition: background 0.2s; flex-shrink: 0;
+        }
+        .btn-remove-option:hover { background: #fff5f5; }
+        .correct-label {
+            font-size: 0.72rem; color: #28a745; font-weight: 600;
+            display: none; white-space: nowrap;
+        }
+        input[type="radio"]:checked ~ .correct-label { display: inline; }
+
+        .correct-hint {
+            font-size: 0.78rem; color: var(--text-muted); margin-top: 10px;
+        }
+        .correct-hint i { color: var(--accent-color); margin-right: 4px; }
+
+        /* ── КНОПКИ ── */
+        .btn-add-option {
+            background: none; border: 1px dashed rgba(139,69,19,0.3);
+            color: var(--primary-color); border-radius: 8px; padding: 7px 14px;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; margin-top: 10px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .btn-add-option:hover { background: rgba(139,69,19,0.05); border-style: solid; }
+
+        .btn-add-question {
+            width: 100%; padding: 14px; background: none;
+            border: 2px dashed rgba(139,69,19,0.25); border-radius: 14px;
+            color: var(--primary-color); font-weight: 600; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 24px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .btn-add-question:hover { background: rgba(139,69,19,0.04); border-color: var(--primary-color); }
+
+        .btn-submit {
+            width: 100%; padding: 16px; background: var(--primary-color);
+            border: none; border-radius: 12px; color: white;
+            font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .btn-submit:hover { background: #6d3410; }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── ОШИБКИ ── */
+        .error-banner {
+            background: #fff5f5; border: 1px solid #dc3545; border-radius: 10px;
+            padding: 14px 18px; color: #dc3545; font-size: 0.875rem;
+            margin-bottom: 20px; display: none;
+        }
+        .error-banner ul { margin: 6px 0 0; padding-left: 18px; }
+        .field-error { font-size: 0.78rem; color: #dc3545; margin-top: 4px; display: none; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-book-open me-2" style="color: var(--accent-color);"></i>
+                ЛитСправочник
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'writers' %}">Писатели</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'works' %}">Произведения</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'tests' %}">Тесты</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'facts' %}">Факты</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+        <div class="page-header">
+            <h1>Создать тест</h1>
+            <p>Заполните основную информацию и добавьте вопросы</p>
+        </div>
+
+        <div class="error-banner" id="errorBanner">
+            <strong>Исправьте ошибки перед сохранением:</strong>
+            <ul id="errorList"></ul>
+        </div>
+
+        <form id="quizForm" novalidate>
+            {% csrf_token %}
+
+            <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
+            <div class="section-card">
+                <div class="section-title">Основная информация</div>
+
+                <div class="mb-3">
+                    <label for="title">Название теста *</label>
+                    <input type="text" class="form-control" id="title" name="title"
+                           placeholder="Например: Знаешь ли ты Пушкина?">
+                    <div class="field-error" id="titleError">Заполните название</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description">Описание</label>
+                    <textarea class="form-control" id="description" name="description"
+                              rows="2" placeholder="Краткое описание теста"></textarea>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="difficulty">Сложность *</label>
+                        <select class="form-select" id="difficulty" name="difficulty">
+                            <option value="">— выберите —</option>
+                            <option value="easy">Лёгкий</option>
+                            <option value="medium">Средний</option>
+                            <option value="hard">Сложный</option>
+                        </select>
+                        <div class="field-error" id="difficultyError">Выберите сложность</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="writer">Писатель</label>
+                        <select class="form-select" id="writer" name="writer">
+                            <option value="">— не привязан —</option>
+                            {% for writer in writers %}
+                                <option value="{{ writer.id }}">{{ writer.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="work">Произведение</label>
+                        <select class="form-select" id="work" name="work">
+                            <option value="">— не привязано —</option>
+                            {% for work in works %}
+                                <option value="{{ work.id }}">{{ work.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВОПРОСЫ -->
+            <div class="section-card">
+                <div class="section-title">Вопросы</div>
+                <div id="questionsList"></div>
+                <button type="button" class="btn-add-question" onclick="addQuestion()">
+                    <i class="fas fa-plus me-2"></i> Добавить вопрос
+                </button>
+            </div>
+
+            <button type="button" class="btn-submit" id="submitBtn">
+                <i class="fas fa-save me-2"></i> Сохранить тест
+            </button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let questionCount = 0;
+
+        // ── ДОБАВИТЬ ВОПРОС ──
+        function addQuestion() {
+            questionCount++;
+            const qIndex = questionCount;
+
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `question-${qIndex}`;
+            block.dataset.qindex = qIndex;
+
+            block.innerHTML = `
+                <div class="question-header">
+                    <span class="question-num">Вопрос <span class="q-num-label">${qIndex}</span></span>
+                    <button type="button" class="btn-remove-question" onclick="removeQuestion(${qIndex})">
+                        <i class="fas fa-trash me-1"></i> Удалить вопрос
+                    </button>
+                </div>
+
+                <div class="mb-2">
+                    <label>Текст вопроса *</label>
+                    <input type="text" class="form-control question-text"
+                           name="questions[${qIndex}][text]"
+                           placeholder="Введите вопрос...">
+                    <div class="field-error q-text-error">Заполните текст вопроса</div>
+                </div>
+
+                <div class="mb-1">
+                    <label>Варианты ответов *</label>
+                    <p class="correct-hint">
+                        <i class="fas fa-info-circle"></i>
+                        Отметьте один правильный ответ радиокнопкой
+                    </p>
+                </div>
+
+                <div class="options-list" id="options-${qIndex}">
+                    <!-- минимум 2 варианта сразу -->
+                </div>
+
+                <div class="field-error q-correct-error" id="correct-error-${qIndex}">
+                    Отметьте правильный ответ
+                </div>
+                <div class="field-error q-options-error" id="options-error-${qIndex}">
+                    Добавьте минимум 2 варианта ответа
+                </div>
+
+                <button type="button" class="btn-add-option" onclick="addOption(${qIndex})">
+                    <i class="fas fa-plus me-1"></i> Добавить вариант
+                </button>`;
+
+            document.getElementById('questionsList').appendChild(block);
+
+            // добавляем два варианта по умолчанию
+            addOption(qIndex);
+            addOption(qIndex);
+
+            renumberQuestions();
+        }
+
+        // ── УДАЛИТЬ ВОПРОС ──
+        function removeQuestion(qIndex) {
+            const block = document.getElementById(`question-${qIndex}`);
+            if (!block) return;
+
+            const total = document.querySelectorAll('.question-block').length;
+            if (total <= 1) {
+                alert('Тест должен содержать хотя бы один вопрос');
+                return;
+            }
+            block.remove();
+            renumberQuestions();
+        }
+
+        // ── ПЕРЕНУМЕРОВАТЬ ВОПРОСЫ ──
+        function renumberQuestions() {
+            document.querySelectorAll('.question-block').forEach((block, i) => {
+                block.querySelector('.q-num-label').textContent = i + 1;
+            });
+        }
+
+        // ── ДОБАВИТЬ ВАРИАНТ ──
+        let optionCounters = {};
+
+        function addOption(qIndex) {
+            if (!optionCounters[qIndex]) optionCounters[qIndex] = 0;
+            optionCounters[qIndex]++;
+            const oIndex = optionCounters[qIndex];
+
+            const row = document.createElement('div');
+            row.className = 'option-row';
+            row.id = `option-${qIndex}-${oIndex}`;
+
+            row.innerHTML = `
+                <label class="option-radio-wrap" title="Правильный ответ">
+                    <input type="radio" name="questions[${qIndex}][correct]" value="${oIndex}"
+                           onchange="onCorrectChange(${qIndex})">
+                    <span style="font-size:0.72rem">✓</span>
+                </label>
+                <input type="text" class="form-control option-text"
+                       name="questions[${qIndex}][options][${oIndex}]"
+                       placeholder="Вариант ответа...">
+                <button type="button" class="btn-remove-option"
+                        onclick="removeOption(${qIndex}, ${oIndex})"
+                        title="Удалить вариант">
+                    <i class="fas fa-times"></i>
+                </button>`;
+
+            document.getElementById(`options-${qIndex}`).appendChild(row);
+        }
+
+        // ── УДАЛИТЬ ВАРИАНТ ──
+        function removeOption(qIndex, oIndex) {
+            const opts = document.querySelectorAll(`#options-${qIndex} .option-row`);
+            if (opts.length <= 2) {
+                alert('Должно быть минимум 2 варианта ответа');
+                return;
+            }
+            const row = document.getElementById(`option-${qIndex}-${oIndex}`);
+            if (row) row.remove();
+        }
+
+        // ── СМЕНА ПРАВИЛЬНОГО ОТВЕТА ──
+        function onCorrectChange(qIndex) {
+            const err = document.getElementById(`correct-error-${qIndex}`);
+            if (err) err.style.display = 'none';
+        }
+
+        // ── ВАЛИДАЦИЯ ──
+        function validate() {
+            let valid = true;
+            const errors = [];
+
+            // title
+            const title = document.getElementById('title');
+            const titleErr = document.getElementById('titleError');
+            if (!title.value.trim()) {
+                title.classList.add('is-invalid');
+                titleErr.style.display = 'block';
+                errors.push('Укажите название теста');
+                valid = false;
+            } else {
+                title.classList.remove('is-invalid');
+                titleErr.style.display = 'none';
+            }
+
+            // difficulty
+            const diff = document.getElementById('difficulty');
+            const diffErr = document.getElementById('difficultyError');
+            if (!diff.value) {
+                diff.classList.add('is-invalid');
+                diffErr.style.display = 'block';
+                errors.push('Выберите сложность');
+                valid = false;
+            } else {
+                diff.classList.remove('is-invalid');
+                diffErr.style.display = 'none';
+            }
+
+            // вопросы
+            const questions = document.querySelectorAll('.question-block');
+            if (questions.length === 0) {
+                errors.push('Добавьте хотя бы один вопрос');
+                valid = false;
+            }
+
+            questions.forEach((block, i) => {
+                const qIndex = block.dataset.qindex;
+                const num = i + 1;
+
+                // текст вопроса
+                const textInput = block.querySelector('.question-text');
+                const textErr = block.querySelector('.q-text-error');
+                if (!textInput.value.trim()) {
+                    textInput.classList.add('is-invalid');
+                    textErr.style.display = 'block';
+                    errors.push(`Вопрос ${num}: заполните текст`);
+                    valid = false;
+                } else {
+                    textInput.classList.remove('is-invalid');
+                    textErr.style.display = 'none';
+                }
+
+                // варианты
+                const optionInputs = block.querySelectorAll('.option-text');
+                const optErr = document.getElementById(`options-error-${qIndex}`);
+                if (optionInputs.length < 2) {
+                    optErr.style.display = 'block';
+                    errors.push(`Вопрос ${num}: добавьте минимум 2 варианта`);
+                    valid = false;
+                } else {
+                    optErr.style.display = 'none';
+                }
+
+                // пустые варианты
+                let hasEmptyOption = false;
+                optionInputs.forEach(inp => {
+                    if (!inp.value.trim()) {
+                        inp.classList.add('is-invalid');
+                        hasEmptyOption = true;
+                    } else {
+                        inp.classList.remove('is-invalid');
+                    }
+                });
+                if (hasEmptyOption) {
+                    errors.push(`Вопрос ${num}: заполните все варианты ответов`);
+                    valid = false;
+                }
+
+                // правильный ответ
+                const correctChecked = block.querySelector(`input[name="questions[${qIndex}][correct]"]:checked`);
+                const correctErr = document.getElementById(`correct-error-${qIndex}`);
+                if (!correctChecked) {
+                    correctErr.style.display = 'block';
+                    errors.push(`Вопрос ${num}: отметьте правильный ответ`);
+                    valid = false;
+                } else {
+                    correctErr.style.display = 'none';
+                }
+            });
+
+            // показываем баннер
+            const banner = document.getElementById('errorBanner');
+            const list = document.getElementById('errorList');
+            if (!valid) {
+                list.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+                banner.style.display = 'block';
+                banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                banner.style.display = 'none';
+            }
+
+            return valid;
+        }
+
+        // ── СБОРКА JSON ──
+        function collectData() {
+            const questions = [];
+
+            document.querySelectorAll('.question-block').forEach(block => {
+                const qIndex = block.dataset.qindex;
+                const correctVal = block.querySelector(`input[name="questions[${qIndex}][correct]"]:checked`)?.value;
+
+                const options = [];
+                block.querySelectorAll('.option-row').forEach(row => {
+                    const radioVal = row.querySelector('input[type="radio"]').value;
+                    options.push({
+                        text: row.querySelector('.option-text').value.trim(),
+                        is_correct: radioVal === correctVal
+                    });
+                });
+
+                questions.push({
+                    text: block.querySelector('.question-text').value.trim(),
+                    options
+                });
+            });
+
+            return {
+                title:       document.getElementById('title').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                difficulty:  document.getElementById('difficulty').value,
+                writer:      document.getElementById('writer').value || null,
+                work:        document.getElementById('work').value || null,
+                questions
+            };
+        }
+
+        // ── САБМИТ ──
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            if (!validate()) return;
+
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Сохранение...';
+
+            try {
+                const res = await fetch('/api/quizzes/create/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify(collectData())
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    window.location.href = `/tests/${data.id}/`;
+                } else {
+                    const err = await res.json();
+                    showServerError(err);
+                }
+            } catch (e) {
+                showServerError({ detail: 'Ошибка соединения с сервером' });
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Сохранить тест';
+            }
+        });
+
+        function showServerError(err) {
+            const banner = document.getElementById('errorBanner');
+            const list = document.getElementById('errorList');
+            const msg = err.detail || err.error || JSON.stringify(err);
+            list.innerHTML = `<li>${msg}</li>`;
+            banner.style.display = 'block';
+            banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function getCSRFToken() {
+            return document.cookie.split(';')
+                .find(c => c.trim().startsWith('csrftoken='))
+                ?.split('=')[1] || '';
+        }
+
+        // убираем ошибки при вводе
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('form-control') || e.target.classList.contains('form-select')) {
+                e.target.classList.remove('is-invalid');
+            }
+        });
+
+        // добавляем первый вопрос сразу
+        addQuestion();
+    </script>
+</body>
+</html>
