@@ -14,7 +14,18 @@ SECRET_KEY = 'django-insecure-6et7!8l9@_e$u19w7t%iw=4vmkpbdf8m$%ow$ura_idv1t5ba(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = [
+    'nenado.duckdns.org',
+    "www.nenado.duckdns.org",
+    "158.160.38.214",
+    "127.0.0.1",
+    '0.0.0.0',
+    'django_app_1',
+    'nginx_1',
+    'nenado-lit.ru',
+    'www.nenado-lit.ru'
+]
 
 
 # Application definition
