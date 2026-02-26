@@ -46,7 +46,7 @@ class FactsSerializer(serializers.ModelSerializer):
     def get_is_laked(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            return obj.likes.all.count()
+            return obj.likes.all().count()
         return False
 
     def get_likes_count(self, obj):

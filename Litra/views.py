@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import user_passes_test
 from .serializers import WriterSerializer, WorksSerializer, FactsSerializer, FastTest, PropertyTest
 from rest_framework.permissions import IsAdminUser
 
+
 def is_staff_or_moderator(user):
     return user.is_staff or user.groups.filter(name='seller').exists()
 
@@ -106,7 +107,7 @@ class FactsViewSet(ListMixin, viewsets.ModelViewSet):
         })
 
 
-def facts(request):
+def facts(request, pk=None):
     return render(request, "Litra/facts.html")
 
 
@@ -190,7 +191,7 @@ class TestsViewSet(viewsets.ModelViewSet):
         )
 
 
-def tests(request):
+def tests(request, pk=None):
     return render(request, 'Litra/test.html')
 
 
@@ -289,3 +290,31 @@ class CreateQuiz(APIView):
                 ]
             )
         return Response({'id': quiz.id}, status=201)
+
+
+@user_passes_test(is_staff_or_moderator)
+def create_fact(request):
+    if request.method == 'POST':
+        Facts.objects.create(
+            title=request.POST['title'],
+            content=request.POST['content'],
+            category=request.POST['category'],
+            period=request.POST.get('period') or None,
+            writer_id=request.POST.get('writer') or None,
+            work_id=request.POST.get('work') or None,
+            image_url=request.POST.get('image_url', ''),
+            source=request.POST.get('source', ''),
+            is_featured=bool(request.POST.get('is_featured'))
+        )
+        return redirect('facts')
+
+    writers = Writers.objects.all().order_by('full_name')
+    works = Works.objects.all().order_by('title')
+    return render(request, 'Litra/create_fact.html', {
+        'writers': writers,
+        'works': works
+    })
+
+
+def ai_assistant(request):
+    return render(request, 'Litra/ai-assistant.html')

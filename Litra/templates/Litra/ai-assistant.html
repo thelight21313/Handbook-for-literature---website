@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-ассистент | Литературный справочник</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary:   #8B4513;
+            --accent:    #DAA520;
+            --bg:        #FAF6F1;
+            --text:      #2C1810;
+            --muted:     #6B5D54;
+            --sidebar-w: 280px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            padding-top: 64px;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            height: 64px;
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700; color: var(--primary) !important; font-size: 1.6rem;
+        }
+        .nav-link { font-weight: 500; color: var(--text) !important; transition: color 0.2s; }
+        .nav-link:hover { color: var(--primary) !important; }
+
+        /* ── LAYOUT ── */
+        .app-shell {
+            display: flex;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: var(--sidebar-w);
+            flex-shrink: 0;
+            background: white;
+            border-right: 1px solid rgba(139,69,19,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-head {
+            padding: 20px 16px 12px;
+            border-bottom: 1px solid rgba(139,69,19,0.08);
+            flex-shrink: 0;
+        }
+        .sidebar-head h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; color: var(--primary); margin: 0 0 12px;
+        }
+        .btn-new-chat {
+            width: 100%;
+            background: var(--primary); color: white;
+            border: none; border-radius: 10px;
+            padding: 9px 12px; font-size: 0.83rem;
+            font-family: 'Montserrat', sans-serif; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+            display: flex; align-items: center; gap: 8px; justify-content: center;
+        }
+        .btn-new-chat:hover { background: #6d3410; }
+
+        .sidebar-list {
+            flex: 1; overflow-y: auto; padding: 8px;
+        }
+        .sidebar-list::-webkit-scrollbar { width: 3px; }
+        .sidebar-list::-webkit-scrollbar-thumb { background: rgba(139,69,19,0.15); border-radius: 2px; }
+
+        /* чат в сайдбаре */
+        .chat-item {
+            padding: 10px 12px; border-radius: 10px;
+            cursor: pointer; transition: background 0.15s;
+            margin-bottom: 2px; position: relative;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .chat-item:hover { background: var(--bg); }
+        .chat-item.active {
+            background: rgba(139,69,19,0.08);
+        }
+        .chat-item-icon {
+            width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+            background: rgba(139,69,19,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; color: var(--primary);
+        }
+        .chat-item.active .chat-item-icon {
+            background: var(--primary); color: white;
+        }
+        .chat-item-body { flex: 1; min-width: 0; }
+        .chat-item-title {
+            font-size: 0.82rem; font-weight: 600; color: var(--text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .chat-item-date {
+            font-size: 0.7rem; color: var(--muted); margin-top: 1px;
+        }
+
+        .chat-item-del {
+            position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--muted); cursor: pointer;
+            padding: 4px; border-radius: 6px; font-size: 0.75rem;
+            opacity: 0; transition: opacity 0.15s, color 0.15s;
+        }
+        .chat-item:hover .chat-item-del { opacity: 1; }
+        .chat-item-del:hover { color: #c0392b; }
+
+        .sidebar-empty {
+            text-align: center; padding: 40px 16px;
+            color: var(--muted); font-size: 0.8rem;
+        }
+        .sidebar-empty i { font-size: 2rem; opacity: 0.2; display: block; margin-bottom: 8px; }
+
+        /* ── MAIN CHAT AREA ── */
+        .chat-area {
+            flex: 1; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        .chat-topbar {
+            padding: 14px 24px;
+            border-bottom: 1px solid rgba(139,69,19,0.08);
+            background: white;
+            display: flex; align-items: center; gap: 12px;
+            flex-shrink: 0; min-height: 60px;
+        }
+        .chat-topbar-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; color: var(--primary); font-weight: 600;
+            flex: 1;
+        }
+        .chat-topbar-sub { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+
+        /* История сообщений */
+        .chat-messages {
+            flex: 1; overflow-y: auto; padding: 24px;
+            display: flex; flex-direction: column; gap: 16px;
+        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(139,69,19,0.15); border-radius: 2px; }
+
+        /* Приветствие (нет активного чата) */
+        .chat-placeholder {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            height: 100%; color: var(--muted); text-align: center; padding: 40px;
+        }
+        .chat-placeholder i { font-size: 3.5rem; opacity: 0.15; margin-bottom: 20px; }
+        .chat-placeholder h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem; color: var(--primary); margin-bottom: 8px;
+        }
+        .chat-placeholder p { font-size: 0.88rem; max-width: 340px; }
+
+        /* Сообщения */
+        .msg {
+            display: flex; gap: 12px; align-items: flex-start;
+            animation: msgIn 0.22s ease both;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .msg.user { flex-direction: row-reverse; }
+
+        .msg-avatar {
+            width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+        }
+        .msg.user .msg-avatar    { background: var(--primary); color: white; }
+        .msg.assistant .msg-avatar {
+            background: linear-gradient(135deg, var(--primary), var(--accent)); color: white;
+        }
+
+        .msg-bubble {
+            max-width: 70%; padding: 12px 16px; border-radius: 16px;
+            font-size: 0.9rem; line-height: 1.65; color: var(--text);
+        }
+        .msg.user .msg-bubble {
+            background: var(--primary); color: white; border-bottom-right-radius: 4px;
+        }
+        .msg.assistant .msg-bubble {
+            background: white; border: 1px solid rgba(139,69,19,0.08);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05); border-bottom-left-radius: 4px;
+        }
+
+        /* Typing dots */
+        .typing-dots { display: flex; gap: 5px; align-items: center; padding: 2px 0; }
+        .typing-dots span {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--muted); opacity: 0.4;
+            animation: dot 1.2s infinite;
+        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dot {
+            0%,60%,100% { opacity: 0.4; transform: scale(1); }
+            30% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ── INPUT ── */
+        .chat-input-area {
+            flex-shrink: 0; padding: 16px 24px 20px;
+            background: white; border-top: 1px solid rgba(139,69,19,0.08);
+        }
+        .chat-input-wrap {
+            background: var(--bg); border-radius: 14px;
+            border: 1.5px solid rgba(139,69,19,0.12);
+            padding: 12px 14px;
+            display: flex; gap: 10px; align-items: flex-end;
+            transition: border-color 0.2s;
+        }
+        .chat-input-wrap:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(218,165,32,0.08);
+        }
+        #messageInput {
+            flex: 1; border: none; outline: none; resize: none;
+            font-family: 'Montserrat', sans-serif; font-size: 0.9rem;
+            color: var(--text); background: transparent;
+            max-height: 130px; line-height: 1.5;
+        }
+        #messageInput::placeholder { color: var(--muted); }
+        #messageInput:disabled { opacity: 0.5; }
+
+        .btn-send {
+            width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+            background: var(--primary); color: white; border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-send:hover { background: #6d3410; transform: scale(1.05); }
+        .btn-send:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+        .input-hint { font-size: 0.7rem; color: var(--muted); margin-top: 7px; text-align: center; }
+
+        /* ── LOADING STATE (sidebar) ── */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(139,69,19,0.06) 25%, rgba(139,69,19,0.12) 50%, rgba(139,69,19,0.06) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.3s infinite;
+            border-radius: 8px;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skel-item { height: 52px; margin-bottom: 4px; border-radius: 10px; }
+
+        /* ── RESPONSIVE: мобильный сайдбар ── */
+        @media (max-width: 640px) {
+            .sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="fas fa-book-open me-2" style="color: var(--accent);"></i>ЛитСправочник
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'writers' %}">Писатели</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'works' %}">Произведения</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'tests' %}">Тесты</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'facts' %}">Факты</a></li>
+                <li class="nav-item"><a class="nav-link active" href="{% url 'ai-assistant' %}">AI-ассистент</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="app-shell">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+        <div class="sidebar-head">
+            <h2><i class="fas fa-comments me-2" style="color:var(--accent);font-size:.9rem;"></i>История чатов</h2>
+            <button class="btn-new-chat" onclick="newChat()">
+                <i class="fas fa-plus"></i> Новый чат
+            </button>
+        </div>
+        <div class="sidebar-list" id="sidebarList">
+            <!-- skeletons при загрузке -->
+            <div class="skel-item skeleton"></div>
+            <div class="skel-item skeleton" style="opacity:.7"></div>
+            <div class="skel-item skeleton" style="opacity:.45"></div>
+        </div>
+    </aside>
+
+    <!-- ── MAIN AREA ── -->
+    <div class="chat-area">
+
+        <div class="chat-topbar" id="chatTopbar">
+            <div style="flex:1">
+                <div class="chat-topbar-title" id="chatTitle">AI-ассистент</div>
+                <div class="chat-topbar-sub" id="chatSub">Задайте любой вопрос о русской литературе</div>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-placeholder" id="chatPlaceholder">
+                <i class="fas fa-feather-alt"></i>
+                <h3>Добро пожаловать</h3>
+                <p>Выберите чат слева или начните новый, чтобы задать вопрос о русской литературе</p>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <div class="chat-input-wrap">
+                <textarea id="messageInput" rows="1" placeholder="Напишите вопрос..." disabled></textarea>
+                <button class="btn-send" id="btnSend" onclick="sendMessage()" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="input-hint">Shift+Enter — отправить &nbsp;·&nbsp; Enter — новая строка</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
+let currentChatId = null;
+let isLoading     = false;
+let chats         = [];          // [{id, title, created_at}, ...]
+
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    loadChats();
+    setupInput();
+});
+
+// ════════════════════════════════════════════
+//  INPUT SETUP
+// ════════════════════════════════════════════
+function setupInput() {
+    const inp = document.getElementById('messageInput');
+
+    inp.addEventListener('input', () => {
+        inp.style.height = 'auto';
+        inp.style.height = Math.min(inp.scrollHeight, 130) + 'px';
+    });
+
+    inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+}
+
+// ════════════════════════════════════════════
+//  SIDEBAR: загрузить список чатов
+// ════════════════════════════════════════════
+async function loadChats() {
+    try {
+        const res = await apiFetch('/api/chats/', 'GET');
+        chats = res;
+        renderSidebar();
+
+        // Если есть чаты — открыть последний
+        if (chats.length > 0) {
+            openChat(chats[0].id);
+        } else {
+            renderSidebar();
+        }
+    } catch (e) {
+        document.getElementById('sidebarList').innerHTML =
+            `<div class="sidebar-empty"><i class="fas fa-exclamation-circle"></i>Не удалось загрузить историю</div>`;
+    }
+}
+
+function renderSidebar() {
+    const list = document.getElementById('sidebarList');
+    if (!chats.length) {
+        list.innerHTML = `<div class="sidebar-empty"><i class="fas fa-ghost"></i>Чатов пока нет</div>`;
+        return;
+    }
+
+    list.innerHTML = chats.map(c => `
+        <div class="chat-item ${c.id === currentChatId ? 'active' : ''}"
+             id="chat-item-${c.id}"
+             onclick="openChat(${c.id})">
+            <div class="chat-item-icon"><i class="fas fa-comment-alt"></i></div>
+            <div class="chat-item-body">
+                <div class="chat-item-title">${escapeHtml(c.title || 'Новый чат')}</div>
+                <div class="chat-item-date">${formatDate(c.created_at)}</div>
+            </div>
+            <button class="chat-item-del" onclick="deleteChat(event, ${c.id})" title="Удалить">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+// ════════════════════════════════════════════
+//  ОТКРЫТЬ ЧАТ (загрузить сообщения)
+// ════════════════════════════════════════════
+async function openChat(chatId) {
+    currentChatId = chatId;
+    renderSidebar();   // обновить активный элемент
+
+    const chat = chats.find(c => c.id === chatId);
+    document.getElementById('chatTitle').textContent = chat?.title || 'Новый чат';
+    document.getElementById('chatSub').textContent   = formatDate(chat?.created_at);
+
+    // показать loader
+    const box = document.getElementById('chatMessages');
+    box.innerHTML = `
+        <div style="text-align:center;padding:60px;color:var(--muted);">
+            <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;opacity:.3;"></i>
+        </div>`;
+
+    enableInput(false);
+
+    try {
+        const messages = await apiFetch(`/api/chats/${chatId}/messages/`, 'GET');
+        renderMessages(messages);
+    } catch (e) {
+        box.innerHTML = `<div class="chat-placeholder"><i class="fas fa-exclamation-triangle"></i><p>Не удалось загрузить сообщения</p></div>`;
+    }
+
+    enableInput(true);
+}
+
+function renderMessages(messages) {
+    const box = document.getElementById('chatMessages');
+
+    if (!messages.length) {
+        box.innerHTML = `
+            <div class="chat-placeholder" id="chatPlaceholder">
+                <i class="fas fa-feather-alt"></i>
+                <h3>Чат пуст</h3>
+                <p>Задайте первый вопрос о русской литературе</p>
+            </div>`;
+        return;
+    }
+
+    box.innerHTML = '';
+    messages.forEach(m => appendMessageDOM(m.role, m.content, false));
+    box.scrollTop = box.scrollHeight;
+}
+
+// ════════════════════════════════════════════
+//  НОВЫЙ ЧАТ
+// ════════════════════════════════════════════
+async function newChat() {
+    try {
+        const chat = await apiFetch('/api/chats/', 'POST', { title: 'Новый чат' });
+        chats.unshift(chat);
+        renderSidebar();
+        openChat(chat.id);
+    } catch (e) {
+        alert('Не удалось создать чат');
+    }
+}
+
+// ════════════════════════════════════════════
+//  УДАЛИТЬ ЧАТ
+// ════════════════════════════════════════════
+async function deleteChat(e, chatId) {
+    e.stopPropagation();
+    if (!confirm('Удалить чат?')) return;
+
+    try {
+        await apiFetch(`/api/chats/${chatId}/`, 'DELETE');
+        chats = chats.filter(c => c.id !== chatId);
+
+        if (currentChatId === chatId) {
+            currentChatId = null;
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="chat-placeholder">
+                    <i class="fas fa-feather-alt"></i>
+                    <h3>Выберите чат</h3>
+                    <p>Или начните новый диалог</p>
+                </div>`;
+            document.getElementById('chatTitle').textContent = 'AI-ассистент';
+            document.getElementById('chatSub').textContent   = 'Задайте любой вопрос о русской литературе';
+            enableInput(false);
+        }
+
+        renderSidebar();
+        if (!currentChatId && chats.length) openChat(chats[0].id);
+    } catch(e) {
+        alert('Не удалось удалить чат');
+    }
+}
+
+// ════════════════════════════════════════════
+//  ОТПРАВИТЬ СООБЩЕНИЕ
+// ════════════════════════════════════════════
+async function sendMessage() {
+    const inp  = document.getElementById('messageInput');
+    const text = inp.value.trim();
+    if (!text || isLoading || !currentChatId) return;
+
+    // Скрыть placeholder если виден
+    const placeholder = document.getElementById('chatPlaceholder');
+    if (placeholder) placeholder.remove();
+
+    appendMessageDOM('user', text);
+    inp.value = ''; inp.style.height = 'auto';
+    setLoading(true);
+
+    const typingId = appendTyping();
+
+    try {
+        // Отправляем на бэкенд: он сохраняет оба сообщения и возвращает ответ AI
+        const data = await apiFetch(`/api/chats/${currentChatId}/messages/`, 'POST', {
+            content: text
+        });
+
+        removeTyping(typingId);
+        appendMessageDOM('assistant', data.reply);
+
+        // Обновить заголовок если бэкенд вернул новый (автогенерация из первого вопроса)
+        if (data.chat_title) {
+            const idx = chats.findIndex(c => c.id === currentChatId);
+            if (idx !== -1) {
+                chats[idx].title = data.chat_title;
+                document.getElementById('chatTitle').textContent = data.chat_title;
+                renderSidebar();
+            }
+        }
+
+    } catch (err) {
+        removeTyping(typingId);
+        appendMessageDOM('assistant', 'Произошла ошибка. Попробуйте ещё раз.');
+    } finally {
+        setLoading(false);
+    }
+}
+
+// ════════════════════════════════════════════
+//  DOM HELPERS
+// ════════════════════════════════════════════
+function appendMessageDOM(role, content, animate = true) {
+    const box = document.getElementById('chatMessages');
+    const msg = document.createElement('div');
+    msg.className = `msg ${role}`;
+    if (!animate) msg.style.animation = 'none';
+
+    const icon = role === 'user' ? 'fas fa-user' : 'fas fa-robot';
+    msg.innerHTML = `
+        <div class="msg-avatar"><i class="${icon}"></i></div>
+        <div class="msg-bubble">${escapeHtml(content).replace(/\n/g,'<br>')}</div>`;
+
+    box.appendChild(msg);
+    box.scrollTop = box.scrollHeight;
+}
+
+let typingCounter = 0;
+function appendTyping() {
+    const id  = 'typing-' + (++typingCounter);
+    const box = document.getElementById('chatMessages');
+    const msg = document.createElement('div');
+    msg.className = 'msg assistant'; msg.id = id;
+    msg.innerHTML = `
+        <div class="msg-avatar"><i class="fas fa-robot"></i></div>
+        <div class="msg-bubble">
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+        </div>`;
+    box.appendChild(msg);
+    box.scrollTop = box.scrollHeight;
+    return id;
+}
+function removeTyping(id) { document.getElementById(id)?.remove(); }
+
+// ════════════════════════════════════════════
+//  API HELPER
+// ════════════════════════════════════════════
+async function apiFetch(url, method = 'GET', body = null) {
+    const opts = {
+        method,
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(url, opts);
+    if (method === 'DELETE') return;          // 204 No Content
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+}
+
+// ════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════
+function enableInput(on) {
+    document.getElementById('messageInput').disabled = !on;
+    document.getElementById('btnSend').disabled      = !on;
+}
+
+function setLoading(val) {
+    isLoading = val;
+    enableInput(!val);
+}
+
+function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = String(text || '');
+    return d.innerHTML;
+}
+
+function getCSRFToken() {
+    return document.cookie.split(';')
+        .find(c => c.trim().startsWith('csrftoken='))
+        ?.split('=')[1] || '';
+}
+
+function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+</script>
+</body>
+</html>

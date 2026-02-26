@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать факт | Литературный справочник</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --accent-color: #DAA520;
+            --background-light: #FAF6F1;
+            --text-dark: #2C1810;
+            --text-muted: #6B5D54;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--background-light);
+            padding-top: 80px;
+        }
+        .navbar {
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700; color: var(--primary-color) !important; font-size: 1.8rem;
+        }
+        .nav-link { font-weight: 500; color: var(--text-dark) !important; transition: color 0.3s; }
+        .nav-link:hover { color: var(--primary-color) !important; }
+
+        .page-wrap { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+        .page-header { margin-bottom: 36px; }
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem; color: var(--primary-color); font-weight: 700;
+        }
+        .page-header p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+
+        .section-card {
+            background: white; border-radius: 16px; padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 24px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif; font-size: 1.25rem;
+            color: var(--primary-color); margin-bottom: 24px; font-weight: 600;
+            padding-bottom: 12px; border-bottom: 1px solid rgba(139,69,19,0.1);
+        }
+
+        label {
+            font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em;
+            text-transform: uppercase; color: var(--text-muted);
+            margin-bottom: 6px; display: block;
+        }
+        .form-control, .form-select {
+            border: 2px solid rgba(139,69,19,0.15); border-radius: 10px;
+            font-family: 'Montserrat', sans-serif; font-size: 0.9rem;
+            padding: 10px 14px; transition: border-color 0.2s;
+            background: white; color: var(--text-dark);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color); outline: none;
+            box-shadow: 0 0 0 4px rgba(218,165,32,0.1);
+        }
+        .form-control.is-invalid, .form-select.is-invalid { border-color: #dc3545; }
+        .field-error { font-size: 0.78rem; color: #dc3545; margin-top: 4px; display: none; }
+
+        .form-check-input { accent-color: var(--accent-color); width: 18px; height: 18px; }
+        .form-check-label { font-size: 0.9rem; color: var(--text-dark); text-transform: none; letter-spacing: 0; font-weight: 400; }
+
+        .btn-submit {
+            width: 100%; padding: 16px; background: var(--primary-color);
+            border: none; border-radius: 12px; color: white;
+            font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .btn-submit:hover { background: #6d3410; }
+
+        .hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 5px; }
+
+        .error-banner {
+            background: #fff5f5; border: 1px solid #dc3545; border-radius: 10px;
+            padding: 14px 18px; color: #dc3545; font-size: 0.875rem;
+            margin-bottom: 20px; display: none;
+        }
+        .error-banner ul { margin: 6px 0 0; padding-left: 18px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-book-open me-2" style="color: var(--accent-color);"></i>
+                ЛитСправочник
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'writers' %}">Писатели</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'works' %}">Произведения</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'tests' %}">Тесты</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'facts' %}">Факты</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+        <div class="page-header">
+            <h1>Создать факт</h1>
+            <p>Заполните информацию о новом интересном факте</p>
+        </div>
+
+        <div class="error-banner" id="errorBanner">
+            <strong>Исправьте ошибки:</strong>
+            <ul id="errorList"></ul>
+        </div>
+
+        <form method="POST" action="{% url 'create_fact' %}" id="factForm" novalidate>
+            {% csrf_token %}
+
+            <!-- ОСНОВНОЕ -->
+            <div class="section-card">
+                <div class="section-title">Основная информация</div>
+
+                <div class="mb-3">
+                    <label for="title">Заголовок *</label>
+                    <input type="text" class="form-control" id="title" name="title"
+                           value="{{ form_data.title|default:'' }}"
+                           placeholder="Краткий заголовок факта">
+                    <div class="field-error" id="titleError">Заполните заголовок</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="content">Содержание *</label>
+                    <textarea class="form-control" id="content" name="content"
+                              rows="6" placeholder="Подробное описание факта">{{ form_data.content|default:'' }}</textarea>
+                    <div class="field-error" id="contentError">Заполните содержание</div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="category">Категория *</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">— выберите —</option>
+                            <option value="biography">Биография</option>
+                            <option value="creative">Творчество</option>
+                            <option value="trivia">Интересное</option>
+                            <option value="history">Исторический контекст</option>
+                            <option value="influence">Влияние и наследие</option>
+                            <option value="general">Общая литература</option>
+                        </select>
+                        <div class="field-error" id="categoryError">Выберите категорию</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="period">Период</label>
+                        <select class="form-select" id="period" name="period">
+                            <option value="">— не указан —</option>
+                            <option value="17">XVII век</option>
+                            <option value="18">XVIII век</option>
+                            <option value="19">XIX век</option>
+                            <option value="20">XX век</option>
+                            <option value="21">XXI век</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ПРИВЯЗКА -->
+            <div class="section-card">
+                <div class="section-title">Привязка</div>
+                <p class="hint mb-3">Факт можно привязать к писателю, произведению, обоим или оставить общим</p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="writer">Писатель</label>
+                        <select class="form-select" id="writer" name="writer">
+                            <option value="">— не привязан —</option>
+                            {% for writer in writers %}
+                                <option value="{{ writer.id }}">{{ writer.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="work">Произведение</label>
+                        <select class="form-select" id="work" name="work">
+                            <option value="">— не привязано —</option>
+                            {% for work in works %}
+                                <option value="{{ work.id }}">{{ work.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ДОПОЛНИТЕЛЬНО -->
+            <div class="section-card">
+                <div class="section-title">Дополнительно</div>
+
+                <div class="mb-3">
+                    <label for="image_url">Ссылка на изображение</label>
+                    <input type="url" class="form-control" id="image_url" name="image_url"
+                           value="{{ form_data.image_url|default:'' }}"
+                           placeholder="https://...">
+                </div>
+
+                <div class="mb-3">
+                    <label for="source">Источник</label>
+                    <input type="text" class="form-control" id="source" name="source"
+                           value="{{ form_data.source|default:'' }}"
+                           placeholder="Книга, статья, сайт...">
+                </div>
+
+                <div class="form-check mt-2">
+                    <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1">
+                    <label class="form-check-label" for="is_featured">
+                        Отметить как избранное редакцией
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save me-2"></i> Сохранить факт
+            </button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('factForm').addEventListener('submit', function(e) {
+            let valid = true;
+            const errors = [];
+
+            const title = document.getElementById('title');
+            const titleErr = document.getElementById('titleError');
+            if (!title.value.trim()) {
+                title.classList.add('is-invalid');
+                titleErr.style.display = 'block';
+                errors.push('Заполните заголовок');
+                valid = false;
+            } else {
+                title.classList.remove('is-invalid');
+                titleErr.style.display = 'none';
+            }
+
+            const content = document.getElementById('content');
+            const contentErr = document.getElementById('contentError');
+            if (!content.value.trim()) {
+                content.classList.add('is-invalid');
+                contentErr.style.display = 'block';
+                errors.push('Заполните содержание');
+                valid = false;
+            } else {
+                content.classList.remove('is-invalid');
+                contentErr.style.display = 'none';
+            }
+
+            const category = document.getElementById('category');
+            const categoryErr = document.getElementById('categoryError');
+            if (!category.value) {
+                category.classList.add('is-invalid');
+                categoryErr.style.display = 'block';
+                errors.push('Выберите категорию');
+                valid = false;
+            } else {
+                category.classList.remove('is-invalid');
+                categoryErr.style.display = 'none';
+            }
+
+            if (!valid) {
+                e.preventDefault();
+                const banner = document.getElementById('errorBanner');
+                document.getElementById('errorList').innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+                banner.style.display = 'block';
+                banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('form-control') || e.target.classList.contains('form-select')) {
+                e.target.classList.remove('is-invalid');
+            }
+        });
+    </script>
+</body>
+</html>

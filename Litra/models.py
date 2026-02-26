@@ -65,6 +65,7 @@ class Facts(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_featured = models.BooleanField(default=False)
+    likes = models.ManyToManyField(User, related_name='liked_facts', blank=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -117,3 +118,6 @@ class Answer(models.Model):
 
     class Meta:
         ordering = ['order']
+
+
+
