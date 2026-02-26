@@ -136,3 +136,8 @@ LOGGING = {
         }
     }
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://nenado-lit.ru',
+    'https://www.nenado-lit.ru',
+]
