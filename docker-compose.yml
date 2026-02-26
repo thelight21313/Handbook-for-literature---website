@@ -13,7 +13,7 @@ services:
   django_app:
     build: .
     # Если на сервере — используй gunicorn, для тестов можно оставить runserver
-    command: gunicorn login.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn myproject.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
       - static_static:/app/staticfiles
