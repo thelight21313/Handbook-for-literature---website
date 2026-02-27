@@ -332,27 +332,26 @@ class ChatsViewSet(viewsets.ModelViewSet):
             return Message.objects.filter(chat_id=chat_id)
         return Chats.objects.filter(user=self.request.user)
 
-    @action(methods=['get'], detail=True, url_path='messages')
+    @action(methods=['get', 'post'], detail=True, url_path='messages')
     def messages(self, request, pk=None):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(methods=['post'], detail=True, url_path='send_messages')
-    def send_messages(self, request, pk=None):
+        if request.methot=='GET':
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
         content = request.data['content']
         Message.objects.create(chat_id=pk, role='user', content=content)
         client = genai.Client()
         chat = self.get_object()
         history = Message.objects.filter(chat_id=pk).order_by('created_at')
-        contents = [{'role':m.role, 'parts':[m.content]} for m in history]
+        contents = [{'role': m.role, 'parts': [m.content]} for m in history]
         response = client.models.generate_content(
             model="gemini-3-flash-preview", contents=contents
         )
         Message.objects.create(chat_id=pk, role='assistant', content=response.text)
 
-        return Response({'reply':response.text,
-                         'chat_title':chat.title})
+        return Response({'reply': response.text,
+                         'chat_title': chat.title})
+
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
