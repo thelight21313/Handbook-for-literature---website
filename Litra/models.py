@@ -132,6 +132,7 @@ class Message(models.Model):
     chat = models.ForeignKey(Chats, on_delete=models.PROTECT, related_name='messages')
     role = models.CharField(choices=ROLES, max_length=10)
     content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 
