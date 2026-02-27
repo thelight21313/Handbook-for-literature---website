@@ -1,17 +1,21 @@
+from datetime import datetime
+
 from django.shortcuts import render
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
+from google import genai
 from rest_framework import viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import F, Count
 from .filters import WriterFilter, WorksFilter, FactsFilter, TestFilter
-from .models import Writers, Works, Facts, Quizz, Question, Answer
+from .models import Writers, Works, Facts, Quizz, Question, Answer, Chats, Message
 from rest_framework.views import APIView
 from django.contrib.auth.decorators import user_passes_test
-from .serializers import WriterSerializer, WorksSerializer, FactsSerializer, FastTest, PropertyTest
+from .serializers import WriterSerializer, WorksSerializer, FactsSerializer, FastTest, PropertyTest, ChatSerializer, \
+    MessageSerializer
 from rest_framework.permissions import IsAdminUser
 
 
@@ -195,10 +199,6 @@ def tests(request, pk=None):
     return render(request, 'Litra/test.html')
 
 
-def ai():
-    pass
-
-
 def search():
     pass
 
@@ -318,3 +318,43 @@ def create_fact(request):
 
 def ai_assistant(request):
     return render(request, 'Litra/ai-assistant.html')
+
+
+class ChatsViewSet(viewsets.ModelViewSet):
+    def get_serializer_class(self):
+        if self.action == 'messages':
+            return MessageSerializer
+        return ChatSerializer
+
+    def get_queryset(self):
+        if self.action == 'messages':
+            chat_id = self.kwargs['pk']
+            return Message.objects.filter(chat_id=chat_id)
+        return Chats.objects.filter(user=self.request.user)
+
+    @action(methods=['get'], detail=True, url_path='messages')
+    def messages(self, request, pk=None):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(methods=['post'], detail=True, url_path='send_messages')
+    def send_messages(self, request, pk=None):
+        content = request.data['content']
+        Message.objects.create(chat_id=pk, role='user', content=content)
+        client = genai.Client()
+        chat = self.get_object()
+        history = Message.objects.filter(chat_id=pk).order_by('created_at')
+        contents = [{'role':m.role, 'parts':[m.content]} for m in history]
+        response = client.models.generate_content(
+            model="gemini-3-flash-preview", contents=contents
+        )
+        Message.objects.create(chat_id=pk, role='assistant', content=response.text)
+
+        return Response({'reply':response.text,
+                         'chat_title':chat.title})
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+

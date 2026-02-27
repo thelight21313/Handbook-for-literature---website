@@ -1,4 +1,4 @@
-from .models import Writers, Works, Facts, Quizz, Question, Answer
+from .models import Writers, Works, Facts, Quizz, Question, Answer, Chats, Message
 import django
 from rest_framework.renderers import JSONRenderer
 from rest_framework import serializers
@@ -81,4 +81,16 @@ class PropertyTest(FastTest):
 
     class Meta(FastTest.Meta):
         fields = FastTest.Meta.fields + ['questions']
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chats
+        fields = ['id', 'title', 'created_at']
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Message
+        fields = ['id', 'role', 'content']
 

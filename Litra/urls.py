@@ -10,6 +10,7 @@ router.register(r'writers', WriterViewSet)
 router.register(r'works', WorksViewSet)
 router.register(r'facts', FactsViewSet)
 router.register(r'tests', TestsViewSet)
+router.register(r'chats', ChatsViewSet)
 
 urlpatterns = [
     path('login/',

@@ -120,4 +120,19 @@ class Answer(models.Model):
         ordering = ['order']
 
 
+class Chats(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chats')
+    title = models.CharField(max_length=100)
+    created_at = models.TimeField()
+
+
+class Message(models.Model):
+    ROLES = [('user', 'пользователь'),
+             ('assistant', 'ассистент')]
+    chat = models.ForeignKey(Chats, on_delete=models.PROTECT, related_name='messages')
+    role = models.CharField(choices=ROLES, max_length=10)
+    content = models.TextField()
+
+
+
 

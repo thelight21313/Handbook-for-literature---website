@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Q
 
-from Litra.models import Writers, Works, Facts, Quizz
+from Litra.models import Writers, Works, Facts, Quizz, Chats
 
 
 class BaseCSVFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
@@ -115,3 +115,5 @@ class TestFilter(django_filters.FilterSet):
             Q(writer__full_name__icontains=value) |
             Q(work__title__icontains=value)
         )
+
+
