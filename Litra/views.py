@@ -334,7 +334,7 @@ class ChatsViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get', 'post'], detail=True, url_path='messages')
     def messages(self, request, pk=None):
-        if request.methot=='GET':
+        if request.method=='GET':
             queryset = self.get_queryset()
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
