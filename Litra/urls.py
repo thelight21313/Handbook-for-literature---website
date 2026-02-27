@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from . import views
 from django.contrib.auth import views as auth_views
-from .views import WriterViewSet, WorksViewSet, FactsViewSet, CreateQuiz, TestsViewSet
+from .views import WriterViewSet, WorksViewSet, FactsViewSet, CreateQuiz, TestsViewSet, ChatsViewSet
 
 router = DefaultRouter()
 router.register(r'writers', WriterViewSet)
