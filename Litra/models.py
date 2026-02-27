@@ -123,7 +123,7 @@ class Answer(models.Model):
 class Chats(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chats')
     title = models.CharField(max_length=100)
-    created_at = models.TimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Message(models.Model):
