@@ -343,7 +343,14 @@ class ChatsViewSet(viewsets.ModelViewSet):
         client = genai.Client()
         chat = self.get_object()
         history = Message.objects.filter(chat_id=pk).order_by('created_at')
-        contents = [{'role': m.role, 'parts': [m.content]} for m in history]
+        contents = [
+            {
+                # Заменяем 'assistant' на 'model', иначе Google не примет
+                'role': 'model' if m.role == 'assistant' else 'user',
+                'parts': [{'text': m.content}]
+            }
+            for m in history
+        ]
         response = client.models.generate_content(
             model="gemini-3-flash-preview", contents=contents
         )
