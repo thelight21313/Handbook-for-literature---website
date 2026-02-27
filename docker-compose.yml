@@ -17,6 +17,8 @@ services:
     volumes:
       - .:/app
       - static_static:/app/staticfiles
+    env_file:
+      - .env
     environment:
       - DB_HOST=database
       - DB_NAME=dbname
