@@ -325,7 +325,7 @@ def ai_assistant(request):
 
 def ask_gemini(contents):
     api_key = os.environ.get('GEMINI_API_KEY')
-    url = f"https://frosty-waterfall-8675.vtkdxycbkx.workers.dev/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    url = f"https://frosty-waterfall-8675.vtkdxycbkx.workers.dev/v1beta/models/gemini-3-flash-preview:generateContent?key={api_key}"
     payload = {"contents": contents}
     response = http_requests.post(url, json=payload)
     data = response.json()
