@@ -384,4 +384,9 @@ class ChatsViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(methods=['delete'], detail=True)
+    def mes(self, request, pk=None):
+        Chats.objects.filter(id=pk).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
