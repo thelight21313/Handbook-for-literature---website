@@ -32,7 +32,7 @@ urlpatterns = [
     path('tests/<int:pk>/result/', views.tests, name='test_result'),
     path('search/', views.search, name="search"),
     path("about/", views.about, name="about"),
-    path("exit/", views.exit, name="exit"),
+    path("exit/", views.exit, name="logout"),
     path("create_writer/", views.create_writer, name="create_writer"),
     path("create_work/", views.create_work, name="create_work"),
     path('api/', include(router.urls)),
