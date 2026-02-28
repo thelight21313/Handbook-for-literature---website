@@ -322,17 +322,17 @@ def ai_assistant(request):
     return render(request, 'Litra/ai-assistant.html')
 
 
+def ask_gemini(contents):
+    api_key = os.environ.get('GEMINI_API_KEY')
+    url = f"https://frosty-waterfall-8675.vtkdxycbkx.workers.dev/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+
+    payload = {"contents": contents}
+    response = requests.post(url, json=payload)
+    data = response.json()
+    return data['candidates'][0]['content']['parts'][0]['text']
+
+
 class ChatsViewSet(viewsets.ModelViewSet):
-
-    def ask_gemini(contents):
-        api_key = os.environ.get('GEMINI_API_KEY')
-        url = f"https://frosty-waterfall-8675.vtkdxycbkx.workers.dev/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-
-        payload = {"contents": contents}
-        response = requests.post(url, json=payload)
-        data = response.json()
-        return data['candidates'][0]['content']['parts'][0]['text']
-
     def get_serializer_class(self):
         if self.action == 'messages':
             return MessageSerializer
@@ -362,7 +362,7 @@ class ChatsViewSet(viewsets.ModelViewSet):
             }
             for m in history
         ]
-        reply = self.ask_gemini(contents)
+        reply = ask_gemini(contents)
         Message.objects.create(chat_id=pk, role='assistant', content=reply)
 
         return Response({'reply': reply,
