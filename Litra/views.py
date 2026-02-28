@@ -343,6 +343,7 @@ class ChatsViewSet(viewsets.ModelViewSet):
         Message.objects.create(chat_id=pk, role='user', content=content)
         client = genai.Client(
             api_key=os.getenv("GOOGLE_API_KEY"),
+            vertexai=True,
             http_options={
                 'api_base_url': 'https://frosty-waterfall-8675.vtkdxycbkx.workers.dev'
             }
