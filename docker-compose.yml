@@ -20,7 +20,6 @@ services:
     env_file:
       - .env
     environment:
-      - GOOGLE_GENAI_API_BASE=https://frosty-waterfall-8675.vtkdxycbkx.workers.dev
       - DB_HOST=database
       - DB_NAME=dbname
       - DB_USER=dbuser
