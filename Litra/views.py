@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+from django.contrib.sites import requests
 from django.shortcuts import render
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
@@ -322,6 +323,16 @@ def ai_assistant(request):
 
 
 class ChatsViewSet(viewsets.ModelViewSet):
+
+    def ask_gemini(contents):
+        api_key = os.environ.get('GEMINI_API_KEY')
+        url = f"https://frosty-waterfall-8675.vtkdxycbkx.workers.dev/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+
+        payload = {"contents": contents}
+        response = requests.post(url, json=payload)
+        data = response.json()
+        return data['candidates'][0]['content']['parts'][0]['text']
+
     def get_serializer_class(self):
         if self.action == 'messages':
             return MessageSerializer
@@ -341,9 +352,6 @@ class ChatsViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         content = request.data['content']
         Message.objects.create(chat_id=pk, role='user', content=content)
-        client = genai.Client(
-            vertexai_mirror='https://frosty-waterfall-8675.vtkdxycbkx.workers.dev'
-        )
         chat = self.get_object()
         history = Message.objects.filter(chat_id=pk).order_by('created_at')
         contents = [
@@ -354,12 +362,10 @@ class ChatsViewSet(viewsets.ModelViewSet):
             }
             for m in history
         ]
-        response = client.models.generate_content(
-            model="gemini-3-flash-preview", contents=contents
-        )
-        Message.objects.create(chat_id=pk, role='assistant', content=response.text)
+        reply = self.ask_gemini(contents)
+        Message.objects.create(chat_id=pk, role='assistant', content=reply)
 
-        return Response({'reply': response.text,
+        return Response({'reply': reply,
                          'chat_title': chat.title})
 
 
