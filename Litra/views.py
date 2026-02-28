@@ -341,13 +341,7 @@ class ChatsViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         content = request.data['content']
         Message.objects.create(chat_id=pk, role='user', content=content)
-        client = genai.Client(
-            api_key=os.getenv("GOOGLE_API_KEY"),
-            vertexai=True,
-            http_options={
-                'api_base_url': 'https://frosty-waterfall-8675.vtkdxycbkx.workers.dev'
-            }
-        )
+        client = genai.Client()
         chat = self.get_object()
         history = Message.objects.filter(chat_id=pk).order_by('created_at')
         contents = [
