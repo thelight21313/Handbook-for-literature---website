@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from django.shortcuts import render
@@ -340,7 +341,12 @@ class ChatsViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         content = request.data['content']
         Message.objects.create(chat_id=pk, role='user', content=content)
-        client = genai.Client()
+        client = genai.Client(
+            api_key=os.getenv("GOOGLE_API_KEY"),
+            http_options={
+                'api_base_url': 'https://frosty-waterfall-8675.vtkdxycbkx.workers.dev'
+            }
+        )
         chat = self.get_object()
         history = Message.objects.filter(chat_id=pk).order_by('created_at')
         contents = [
