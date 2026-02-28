@@ -353,7 +353,7 @@ class ChatsViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         content = request.data['content']
         Message.objects.create(chat_id=pk, role='user', content=content)
-        chat = self.get_object()
+        chat = Chats.objects.get(id=pk)
         history = Message.objects.filter(chat_id=pk).order_by('created_at')
         contents = [
             {
