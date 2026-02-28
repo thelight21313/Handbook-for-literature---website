@@ -1,64 +1,367 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <title>Регистрация</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация | ЛитСправочник</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: Arial, sans-serif; background:#f3f3f3; padding:40px; }
-    .box { max-width: 320px; margin:auto; background:white; padding:20px; border-radius:6px; border:1px solid #ccc; }
-    input { width:90%; padding:10px; margin:8px 0; border:1px solid #bbb; border-radius:4px; }
-    button { width:100%; padding:10px; margin-top:10px; border:0; background:#1976d2; color:white; border-radius:4px; cursor:pointer; }
-    .error { color: #d32f2f; font-size: 12px; margin-top: 3px; }
-    .help-text { color: #666; font-size: 12px; margin-top: 3px; }
+    :root {
+      --primary: #8B4513;
+      --accent:  #DAA520;
+      --bg:      #FAF6F1;
+      --text:    #2C1810;
+      --muted:   #6B5D54;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-pattern {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        radial-gradient(circle at 85% 15%, rgba(139,69,19,0.06) 0%, transparent 50%),
+        radial-gradient(circle at 15% 85%, rgba(218,165,32,0.06) 0%, transparent 50%);
+    }
+
+    .bg-lines {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 60px,
+        rgba(139,69,19,0.03) 60px,
+        rgba(139,69,19,0.03) 61px
+      );
+    }
+
+    /* Правая декоративная панель */
+    .split-right {
+      display: none;
+      position: fixed; right: 0; top: 0; bottom: 0; width: 42%;
+      background: linear-gradient(160deg, #6d3410 0%, #8B4513 60%, #a0521a 100%);
+      z-index: 1;
+      align-items: center; justify-content: center;
+      flex-direction: column;
+      padding: 60px;
+    }
+
+    @media (min-width: 900px) {
+      .split-right { display: flex; }
+    }
+
+    .split-right::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 30px,
+        rgba(255,255,255,0.03) 30px,
+        rgba(255,255,255,0.03) 31px
+      );
+    }
+
+    .split-right-content {
+      position: relative; z-index: 1; text-align: center; color: white;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .split-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .split-logo i { color: var(--accent); margin-right: 10px; }
+
+    .split-tagline {
+      font-size: 0.85rem; font-weight: 300;
+      opacity: 0.7; letter-spacing: 0.05em;
+      line-height: 1.7; max-width: 260px; margin: 0 auto 40px;
+    }
+
+    .split-features {
+      list-style: none; text-align: left; max-width: 280px; margin: 0 auto;
+    }
+
+    .split-features li {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.85rem; opacity: 0.8;
+    }
+
+    .split-features li:last-child { border-bottom: none; }
+
+    .split-features i {
+      color: var(--accent); width: 18px; text-align: center; font-size: 0.9rem;
+    }
+
+    /* Форма */
+    .form-wrap {
+      position: relative; z-index: 2;
+      width: 100%; max-width: 420px;
+      padding: 20px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    @media (min-width: 900px) {
+      .form-wrap {
+        margin-right: 42%;
+        max-width: 480px;
+      }
+    }
+
+    .form-card {
+      background: white;
+      border-radius: 20px;
+      padding: 48px 44px;
+      box-shadow: 0 8px 40px rgba(44,24,16,0.08), 0 1px 0 rgba(139,69,19,0.06);
+      border: 1px solid rgba(139,69,19,0.06);
+    }
+
+    .form-header { margin-bottom: 36px; }
+
+    .form-header .brand-mobile {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; color: var(--primary); font-weight: 700;
+      margin-bottom: 28px;
+    }
+
+    @media (min-width: 900px) {
+      .form-header .brand-mobile { display: none; }
+    }
+
+    .form-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem; color: var(--text);
+      font-weight: 700; margin-bottom: 6px;
+    }
+
+    .form-header p {
+      font-size: 0.85rem; color: var(--muted); font-weight: 400;
+    }
+
+    .form-group { margin-bottom: 20px; }
+
+    .form-group label {
+      display: block; margin-bottom: 7px;
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--muted); letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-wrap i {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); font-size: 0.85rem; pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    .form-control {
+      width: 100%; padding: 13px 14px 13px 40px;
+      border: 1.5px solid rgba(139,69,19,0.15);
+      border-radius: 11px; font-size: 0.9rem;
+      font-family: 'Montserrat', sans-serif;
+      color: var(--text); background: var(--bg);
+      transition: all 0.2s; outline: none;
+    }
+
+    .form-control::placeholder { color: rgba(107,93,84,0.5); }
+
+    .form-control:focus {
+      border-color: var(--accent);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(218,165,32,0.1);
+    }
+
+    .input-wrap:focus-within i { color: var(--accent); }
+
+    .field-errors {
+      color: #9b2335; font-size: 0.78rem;
+      margin-top: 5px; padding-left: 4px;
+    }
+
+    .help-text {
+      color: var(--muted); font-size: 0.75rem;
+      margin-top: 5px; padding-left: 4px; line-height: 1.5;
+    }
+
+    .btn-submit {
+      width: 100%; padding: 14px;
+      background: var(--primary); color: white;
+      border: none; border-radius: 11px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 8px; letter-spacing: 0.02em;
+    }
+
+    .btn-submit:hover {
+      background: #6d3410;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(139,69,19,0.25);
+    }
+
+    .btn-submit:active { transform: translateY(0); }
+
+    .form-footer {
+      text-align: center; margin-top: 28px;
+      font-size: 0.85rem; color: var(--muted);
+    }
+
+    .form-footer a {
+      color: var(--primary); font-weight: 600;
+      text-decoration: none; transition: color 0.2s;
+    }
+
+    .form-footer a:hover { color: var(--accent); }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 28px 0; color: var(--muted); font-size: 0.75rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: rgba(139,69,19,0.1);
+    }
+
+    .btn-home {
+      width: 100%; padding: 12px;
+      background: transparent; color: var(--muted);
+      border: 1.5px solid rgba(139,69,19,0.12);
+      border-radius: 11px; font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem; font-weight: 500; cursor: pointer;
+      transition: all 0.2s; text-decoration: none;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .btn-home:hover {
+      border-color: var(--primary); color: var(--primary);
+      background: rgba(139,69,19,0.03);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Регистрация</h2>
+  <div class="bg-pattern"></div>
+  <div class="bg-lines"></div>
 
-    <form method="post" action="{% url 'register' %}">
-      {% csrf_token %}
-
-      <!-- Поле username -->
-      <div>
-        <input type="text"
-               placeholder="Имя пользователя"
-               name="username"
-               value="{{ form.username.value|default_if_none:'' }}">
-        {% if form.username.errors %}
-          {% for error in form.username.errors %}
-            <div class="error">{{ error }}</div>
-          {% endfor %}
-        {% endif %}
+  <!-- Правая панель -->
+  <div class="split-right">
+    <div class="split-right-content">
+      <div class="split-logo">
+        <i class="fas fa-book-open"></i>ЛитСправочник
       </div>
-
-      <!-- Поле password1 -->
-      <div>
-        <input type="password"
-               placeholder="Пароль"
-               name="password1">
-        {% if form.password1.errors %}
-          {% for error in form.password1.errors %}
-            <div class="error">{{ error }}</div>
-          {% endfor %}
-        {% endif %}
-        <div class="help-text">{{ form.password1.help_text }}</div>
-      </div>
-
-      <!-- Поле password2 -->
-      <div>
-        <input type="password"
-               placeholder="Повторите пароль"
-               name="password2">
-        {% if form.password2.errors %}
-          {% for error in form.password2.errors %}
-            <div class="error">{{ error }}</div>
-          {% endfor %}
-        {% endif %}
-      </div>
-
-      <button type="submit">Создать аккаунт</button>
-    </form>
-
-    <a href="{% url 'login' %}">Уже есть аккаунт? Войти</a>
+      <p class="split-tagline">Присоединяйтесь и откройте мир русской литературы</p>
+      <ul class="split-features">
+        <li><i class="fas fa-users"></i> Биографии писателей</li>
+        <li><i class="fas fa-book"></i> Краткие содержания произведений</li>
+        <li><i class="fas fa-question-circle"></i> Тесты по литературе</li>
+        <li><i class="fas fa-lightbulb"></i> Интересные факты</li>
+        <li><i class="fas fa-robot"></i> AI-ассистент по литературе</li>
+      </ul>
+    </div>
   </div>
+
+  <!-- Форма -->
+  <div class="form-wrap">
+    <div class="form-card">
+      <div class="form-header">
+        <div class="brand-mobile">
+          <i class="fas fa-book-open" style="color: var(--accent);"></i>
+          ЛитСправочник
+        </div>
+        <h1>Создать аккаунт</h1>
+        <p>Зарегистрируйтесь, чтобы начать</p>
+      </div>
+
+      <form method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="username">Имя пользователя</label>
+          <div class="input-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" id="username" name="username"
+                   class="form-control"
+                   placeholder="Придумайте логин"
+                   autocomplete="off"
+                   value="{{ form.username.value|default_if_none:'' }}">
+          </div>
+          {% if form.username.errors %}
+            <div class="field-errors">
+              {% for error in form.username.errors %}<i class="fas fa-exclamation-circle"></i> {{ error }}{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="password1">Пароль</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password1" name="password1"
+                   class="form-control"
+                   placeholder="Придумайте пароль">
+          </div>
+          {% if form.password1.errors %}
+            <div class="field-errors">
+              {% for error in form.password1.errors %}<i class="fas fa-exclamation-circle"></i> {{ error }}{% endfor %}
+            </div>
+          {% endif %}
+          {% if form.password1.help_text %}
+            <div class="help-text">{{ form.password1.help_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="password2">Подтверждение пароля</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password2" name="password2"
+                   class="form-control"
+                   placeholder="Повторите пароль">
+          </div>
+          {% if form.password2.errors %}
+            <div class="field-errors">
+              {% for error in form.password2.errors %}<i class="fas fa-exclamation-circle"></i> {{ error }}{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-user-plus"></i> Зарегистрироваться
+        </button>
+      </form>
+
+      <div class="divider">или</div>
+
+      <a href="{% url 'home' %}" class="btn-home">
+        <i class="fas fa-home"></i> На главную
+      </a>
+
+      <div class="form-footer">
+        Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
