@@ -102,7 +102,7 @@ class Quizz(models.Model):
 
 
 class Question(models.Model):
-    quiz = models.ForeignKey(Quizz, on_delete=models.PROTECT, related_name='questions')
+    quiz = models.ForeignKey(Quizz, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
     order = models.PositiveIntegerField()
 
