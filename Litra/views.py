@@ -330,6 +330,7 @@ def ask_gemini(contents):
     payload = {"contents": contents}
     response = http_requests.post(url, json=payload)
     data = response.json()
+    print("GEMINI RESPONSE:", data)  # временно
     return data['candidates'][0]['content']['parts'][0]['text']
 
 
