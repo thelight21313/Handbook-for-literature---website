@@ -521,6 +521,12 @@
                         <!-- загружается через JS -->
                     </div>
                 </div>
+                {% if user.is_staff or user.is_superuser  or is_seller%}
+                <a href="{% url 'create_work' %}" class="admin-add-btn" title="Добавить произведения">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Книга</span>
+                </a>
+                {% endif %}
             </div>
         </div>
 
