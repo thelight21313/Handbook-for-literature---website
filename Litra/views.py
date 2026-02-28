@@ -19,6 +19,7 @@ from django.contrib.auth.decorators import user_passes_test
 from .serializers import WriterSerializer, WorksSerializer, FactsSerializer, FastTest, PropertyTest, ChatSerializer, \
     MessageSerializer
 from rest_framework.permissions import IsAdminUser
+import requests as http_requests
 
 
 def is_staff_or_moderator(user):
@@ -327,7 +328,7 @@ def ask_gemini(contents):
     url = f"https://frosty-waterfall-8675.vtkdxycbkx.workers.dev/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
 
     payload = {"contents": contents}
-    response = requests.post(url, json=payload)
+    response = http_requests.post(url, json=payload)
     data = response.json()
     return data['candidates'][0]['content']['parts'][0]['text']
 
