@@ -189,6 +189,58 @@
             .filters-section { position: static; margin-bottom: 30px; }
             .facts-grid { grid-template-columns: 1fr; }
         }
+    
+        .btn-logout {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; border-radius: 8px;
+            background: var(--primary-color); color: white !important;
+            font-size: 0.85rem; font-weight: 600; text-decoration: none;
+            transition: all 0.2s; font-family: 'Montserrat', sans-serif;
+        }
+        .btn-logout:hover { background: #6d3410; transform: translateY(-1px); color: white !important; }
+
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #6d3410 50%, #2C1810 100%);
+            color: white; padding: 60px 0 50px; margin: -40px 0 50px; position: relative; overflow: hidden;
+        }
+        .page-hero::before {
+            content: ""; position: absolute; inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(255,255,255,0.02) 30px, rgba(255,255,255,0.02) 31px);
+        }
+        .page-hero::after {
+            content: ""; position: absolute; right: -80px; top: -80px;
+            width: 400px; height: 400px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(218,165,32,0.15) 0%, transparent 70%);
+        }
+        .page-hero-inner { position: relative; z-index: 1; text-align: center; }
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif; font-size: 3rem;
+            font-weight: 700; margin-bottom: 12px; color: white;
+        }
+        .page-hero p { font-size: 1.05rem; opacity: 0.75; max-width: 600px; margin: 0 auto; }
+        .page-hero .accent-line {
+            width: 60px; height: 3px; margin: 0 auto 16px;
+            background: linear-gradient(90deg, #DAA520, rgba(218,165,32,0.3));
+            border-radius: 2px;
+        }
+
+    
+        /* Цветные акценты карточек */
+        .writer-card, .work-card, .fact-card, .quiz-card {
+            border-left: 3px solid transparent;
+            background-image: linear-gradient(white, white), linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            border-image: linear-gradient(135deg, var(--primary-color), var(--accent-color)) 1;
+        }
+        .writer-card:hover, .work-card:hover, .fact-card:hover, .quiz-card:hover {
+            border-left-color: var(--accent-color);
+        }
+        .filters-section {
+            border-top: 4px solid var(--accent-color);
+        }
+        .filter-title { border-bottom: 1px solid rgba(139,69,19,0.1); padding-bottom: 15px; }
+
     </style>
 </head>
 <body>
@@ -202,12 +254,17 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="{% url 'writers' %}">Писатели</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'works' %}">Произведения</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'tests' %}">Тесты</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="{% url 'facts' %}">Интересные факты</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'ai_assistant' %}">AI-ассистент</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'facts' %}">Факты</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'ai-assistant' %}">AI-ассистент</a></li>
+                    <li class="nav-item ms-2">
+                        <a href="{% url 'logout' %}" class="btn-logout">
+                            <i class="fas fa-sign-out-alt"></i> Выйти
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -215,21 +272,15 @@
 
     <div class="container main-content">
         <div id="listView" style="display: block;">
-            <div class="page-header" data-aos="fade-down">
+                <div class="page-hero">
+        <div class="container">
+            <div class="page-hero-inner">
+                <div class="accent-line"></div>
                 <h1>Интересные факты</h1>
-                <p>Узнайте больше о русской литературе, писателях и их произведениях</p>
-                {% if request.user.is_staff %}
-                <a href="{% url 'create_fact' %}" style="
-                    display: inline-flex; align-items: center; gap: 8px;
-                    margin-top: 20px; padding: 10px 24px;
-                    background: var(--primary-color); color: white;
-                    border-radius: 10px; font-weight: 600; font-size: 0.9rem;
-                    text-decoration: none; transition: background 0.3s;
-                ">
-                    <i class="fas fa-plus"></i> Создать факт
-                </a>
-                {% endif %}
+                <p>Узнайте больше о русской литературе и её создателях</p>
             </div>
+        </div>
+    </div>
 
             <div class="row">
                 <div class="col-lg-3">
