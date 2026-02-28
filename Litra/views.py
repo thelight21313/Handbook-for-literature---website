@@ -369,11 +369,18 @@ class ChatsViewSet(viewsets.ModelViewSet):
         history = Message.objects.filter(chat_id=pk).order_by('created_at')
         contents = [
             {
-                # Заменяем 'assistant' на 'model', иначе Google не примет
-                'role': 'model' if m.role == 'assistant' else 'user',
-                'parts': [{'text': m.content}]
-            }
-            for m in history
+                'role': 'user',
+                'parts': [
+                    {'text': 'Ты литературный ассистент. Помогаешь с вопросами о книгах, писателях и произведениях. Далее тебе поступит история чата пользователя'
+                             'и его сообщение, отвечай опираясь на свою роль'}]
+            },
+            *[
+                {
+                    'role': 'model' if m.role == 'assistant' else 'user',
+                    'parts': [{'text': m.content}]
+                }
+                for m in history
+            ]
         ]
         reply = ask_gemini(contents)
         Message.objects.create(chat_id=pk, role='assistant', content=reply)
