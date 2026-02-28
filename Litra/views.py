@@ -342,9 +342,8 @@ class ChatsViewSet(viewsets.ModelViewSet):
         content = request.data['content']
         Message.objects.create(chat_id=pk, role='user', content=content)
         client = genai.Client(
-            http_options={
-                'api_endpoint': 'https://frosty-waterfall-8675.vtkdxycbkx.workers.dev'
-            }
+            vertexai=False,  # Убедитесь, что используете Gemini API, а не Vertex
+            base_url='https://frosty-waterfall-8675.vtkdxycbkx.workers.dev'
         )
         chat = self.get_object()
         history = Message.objects.filter(chat_id=pk).order_by('created_at')
