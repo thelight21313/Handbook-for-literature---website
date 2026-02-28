@@ -15,10 +15,10 @@ from django.db.models import F, Count
 from .filters import WriterFilter, WorksFilter, FactsFilter, TestFilter
 from .models import Writers, Works, Facts, Quizz, Question, Answer, Chats, Message
 from rest_framework.views import APIView
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from .serializers import WriterSerializer, WorksSerializer, FactsSerializer, FastTest, PropertyTest, ChatSerializer, \
     MessageSerializer
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 import requests as http_requests
 
 
@@ -62,11 +62,13 @@ def register(request):
     return render(request, 'Litra/register.html', {'form': form})
 
 
+@login_required
 def home(request):
     return render(request, "Litra/home.html")
 
 
 class WriterViewSet(ListMixin, FavoriteMixin, viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Writers.objects.all().prefetch_related('favorited_by')
     serializer_class = WriterSerializer
     filter_backends = [DjangoFilterBackend]
@@ -75,6 +77,7 @@ class WriterViewSet(ListMixin, FavoriteMixin, viewsets.ModelViewSet):
 
 
 class WorksViewSet(ListMixin, FavoriteMixin, viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Works.objects.select_related('author_name').all()
     serializer_class = WorksSerializer
     filter_backends = [DjangoFilterBackend]
@@ -82,11 +85,13 @@ class WorksViewSet(ListMixin, FavoriteMixin, viewsets.ModelViewSet):
     response_key = 'works'
 
 
+@login_required
 def works(request, pk=None):
     return render(request, "Litra/works.html")
 
 
 class FactsViewSet(ListMixin, viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Facts.objects.all()
     serializer_class = FactsSerializer
     filter_backends = [DjangoFilterBackend]
@@ -114,11 +119,13 @@ class FactsViewSet(ListMixin, viewsets.ModelViewSet):
         })
 
 
+@login_required
 def facts(request, pk=None):
     return render(request, "Litra/facts.html")
 
 
 class TestsViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Quizz.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_class = TestFilter
@@ -198,6 +205,7 @@ class TestsViewSet(viewsets.ModelViewSet):
         )
 
 
+@login_required
 def tests(request, pk=None):
     return render(request, 'Litra/test.html')
 
@@ -250,6 +258,7 @@ def create_work(request):
     return render(request, "Litra/create_works.html", {'writers': writers})
 
 
+@login_required
 def writers(request, writer_id=None):
     return render(request, 'Litra/writers.html')
 
@@ -319,6 +328,7 @@ def create_fact(request):
     })
 
 
+@login_required
 def ai_assistant(request):
     return render(request, 'Litra/ai-assistant.html')
 
@@ -334,6 +344,8 @@ def ask_gemini(contents):
 
 
 class ChatsViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
     def get_serializer_class(self):
         if self.action == 'messages':
             return MessageSerializer
@@ -368,7 +380,6 @@ class ChatsViewSet(viewsets.ModelViewSet):
 
         return Response({'reply': reply,
                          'chat_title': chat.title})
-
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
