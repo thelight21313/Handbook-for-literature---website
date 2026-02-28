@@ -402,6 +402,17 @@
                     </div>
                 </div>
             </div>
+            {% if request.user.is_staff %}
+            <a href="{% url 'create_fact' %}" style="
+                display: inline-flex; align-items: center; gap: 8px;
+                margin-top: 20px; padding: 10px 24px;
+                background: var(--primary-color); color: white;
+                border-radius: 10px; font-weight: 600; font-size: 0.9rem;
+                text-decoration: none; transition: background 0.3s;
+            ">
+                <i class="fas fa-plus"></i> Создать факт
+            </a>
+            {% endif %}
         </div>
 
         <div id="detailView" style="display: none;">
