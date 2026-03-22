@@ -226,7 +226,7 @@ def search(request):
             Q(title__icontains=q) | Q(description__icontains=q)
         )
         context['facts'] = Quizz.objects.filter(
-            Q(titile__icontains=q) | Q(content__icontains=q)
+            Q(title__icontains=q) | Q(content__icontains=q)
         )
     return render(request, 'Litra/search.html', context)
 
