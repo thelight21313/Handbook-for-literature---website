@@ -64,8 +64,14 @@ def register(request):
 
 @login_required
 def home(request):
-    context = RecentlyUpdate.objects.select_related('content_type').order_by('created_at')
-    return render(request, "Litra/home.html", {'recent': context})
+    context = RecentlyUpdate.objects.select_related('content_type').order_by('-created_at')[:6]
+    return render(request, "Litra/home.html", {
+        'recent': context,
+        'writers_count': Writers.objects.count(),
+        'works_count': Works.objects.count(),
+        'tests_count': Quizz.objects.count(),
+        'facts_count': Facts.objects.count(),
+    })
 
 
 class WriterViewSet(ListMixin, FavoriteMixin, viewsets.ModelViewSet):
