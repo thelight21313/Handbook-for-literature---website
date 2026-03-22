@@ -602,7 +602,7 @@
             const year = parseInt(document.getElementById('publication_year').value);
             const period = document.getElementById('period').value;
 
-            const expectedPeriod = Math.floor(year / 100);
+            const expectedPeriod = Math.floor(year / 100 + 1);
 
             if (period != expectedPeriod) {
                 if (!confirm(`Год публикации ${year} относится к ${expectedPeriod} веку, но выбран ${period} век. Продолжить?`)) {
