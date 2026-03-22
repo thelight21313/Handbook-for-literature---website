@@ -223,7 +223,7 @@ def search(request):
             Q(title__icontains=q) | Q(description__icontains=q) | Q(author_name__full_name__icontains=q) | Q(genre__icontains=q)
         )
         context['tests'] = Quizz.objects.filter(
-            Q(titile__icontains=q) | Q(description__icontains=q)
+            Q(title__icontains=q) | Q(description__icontains=q)
         )
         context['facts'] = Quizz.objects.filter(
             Q(titile__icontains=q) | Q(content__icontains=q)
