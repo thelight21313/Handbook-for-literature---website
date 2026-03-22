@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск: {{ q }} | ЛитСправочник</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B4513;
+            --accent:  #DAA520;
+            --bg:      #FAF6F1;
+            --text:    #2C1810;
+            --muted:   #6B5D54;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg); color: var(--text);
+            padding-top: 64px;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+            height: 64px;
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700; color: var(--primary) !important; font-size: 1.6rem;
+        }
+        .nav-link { font-weight: 500; color: var(--text) !important; transition: color 0.2s; }
+        .nav-link:hover { color: var(--primary) !important; }
+        .btn-logout {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; border-radius: 8px;
+            background: var(--primary); color: white !important;
+            font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s;
+        }
+        .btn-logout:hover { background: #6d3410; }
+
+        /* SEARCH HERO */
+        .search-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, #6d3410 50%, #2C1810 100%);
+            padding: 40px 0 0; position: relative; overflow: hidden;
+        }
+
+        .search-hero::before {
+            content: '';
+            position: absolute; top: -60px; right: -60px;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(218,165,32,0.15) 0%, transparent 70%);
+        }
+
+        .search-hero-inner {
+            position: relative; z-index: 1; color: white;
+            padding-bottom: 0;
+        }
+
+        .search-label {
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+            text-transform: uppercase; color: rgba(218,165,32,0.8);
+            margin-bottom: 8px;
+        }
+
+        .search-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem; font-weight: 700; margin-bottom: 24px;
+        }
+
+        .search-heading span { color: var(--accent); font-style: italic; }
+
+        /* Строка поиска */
+        .search-bar {
+            display: flex; align-items: center;
+            background: white; border-radius: 14px 14px 0 0;
+            padding: 6px 6px 6px 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            max-width: 680px;
+        }
+
+        .search-bar input {
+            flex: 1; border: none; outline: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem; color: var(--text);
+            background: transparent; padding: 8px 0;
+        }
+
+        .search-bar input::placeholder { color: rgba(107,93,84,0.45); }
+
+        .search-bar button {
+            background: var(--primary); color: white;
+            border: none; border-radius: 10px;
+            padding: 11px 22px; font-size: 0.87rem;
+            font-weight: 600; font-family: 'Montserrat', sans-serif;
+            cursor: pointer; transition: background 0.2s;
+            display: flex; align-items: center; gap: 7px;
+        }
+
+        .search-bar button:hover { background: #6d3410; }
+
+        /* ВКЛАДКИ */
+        .tabs-wrap {
+            background: white;
+            border-bottom: 1px solid rgba(139,69,19,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .tabs {
+            display: flex; gap: 0; overflow-x: auto;
+            scrollbar-width: none; max-width: 680px;
+        }
+
+        .tabs::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 16px 20px; border: none; background: transparent;
+            font-family: 'Montserrat', sans-serif; font-size: 0.85rem;
+            font-weight: 500; color: var(--muted); cursor: pointer;
+            border-bottom: 3px solid transparent; transition: all 0.2s;
+            white-space: nowrap; flex-shrink: 0;
+        }
+
+        .tab-btn:hover { color: var(--primary); }
+
+        .tab-btn.active {
+            color: var(--primary); font-weight: 600;
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-count {
+            background: rgba(139,69,19,0.08); color: var(--primary);
+            padding: 2px 8px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700;
+        }
+
+        .tab-btn.active .tab-count {
+            background: var(--accent); color: var(--text);
+        }
+
+        /* КОНТЕНТ */
+        .results-wrap { padding: 40px 0 60px; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Карточка результата */
+        .result-card {
+            background: white; border-radius: 14px;
+            padding: 20px 24px; margin-bottom: 12px;
+            border: 1px solid rgba(139,69,19,0.07);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            display: flex; gap: 16px; align-items: flex-start;
+            text-decoration: none; color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .result-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(139,69,19,0.1);
+            border-color: rgba(139,69,19,0.15);
+            color: var(--text);
+        }
+
+        .result-img {
+            width: 60px; height: 60px; border-radius: 10px;
+            object-fit: cover; flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(139,69,19,0.1), rgba(218,165,32,0.1));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; color: rgba(139,69,19,0.3);
+            overflow: hidden;
+        }
+
+        .result-img img { width: 100%; height: 100%; object-fit: cover; }
+
+        .result-body { flex: 1; min-width: 0; }
+
+        .result-badge {
+            display: inline-block;
+            background: rgba(139,69,19,0.07); color: var(--primary);
+            padding: 2px 9px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .result-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem; font-weight: 600;
+            margin-bottom: 4px; color: var(--text);
+        }
+
+        .result-meta {
+            font-size: 0.8rem; color: var(--muted); margin: 0;
+        }
+
+        .result-arrow {
+            color: rgba(139,69,19,0.2); font-size: 0.85rem;
+            align-self: center; flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .result-card:hover .result-arrow {
+            color: var(--accent); transform: translateX(3px);
+        }
+
+        /* Пустой результат */
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem; opacity: 0.15;
+            display: block; margin-bottom: 16px;
+        }
+
+        .empty-state p { font-size: 0.9rem; }
+
+        /* Нет запроса */
+        .no-query {
+            text-align: center; padding: 80px 20px; color: var(--muted);
+        }
+
+        .no-query i {
+            font-size: 4rem; opacity: 0.1;
+            display: block; margin-bottom: 20px;
+        }
+
+        .no-query h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; color: var(--primary); margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="fas fa-book-open me-2" style="color: var(--accent);"></i>ЛитСправочник
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-1">
+                <li class="nav-item"><a class="nav-link" href="{% url 'writers' %}">Писатели</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'works' %}">Произведения</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'tests' %}">Тесты</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'facts' %}">Факты</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'ai-assistant' %}">AI-ассистент</a></li>
+                <li class="nav-item ms-2">
+                    <a href="{% url 'logout' %}" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Выйти
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- SEARCH HERO -->
+<div class="search-hero">
+    <div class="container">
+        <div class="search-hero-inner">
+            <p class="search-label">Результаты поиска</p>
+            {% if q %}
+            <h1 class="search-heading">По запросу <span>«{{ q }}»</span></h1>
+            {% else %}
+            <h1 class="search-heading">Поиск по сайту</h1>
+            {% endif %}
+
+            <form action="{% url 'search' %}" method="GET">
+                <div class="search-bar">
+                    <i class="fas fa-search me-3" style="color: var(--muted); font-size: 0.9rem;"></i>
+                    <input type="text" name="q" value="{{ q }}"
+                           placeholder="Пушкин, Война и мир..." autocomplete="off">
+                    <button type="submit">
+                        <i class="fas fa-search"></i> Найти
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ВКЛАДКИ -->
+{% if q %}
+<div class="tabs-wrap">
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('all', this)">
+                Все
+                <span class="tab-count">{{ total_count }}</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('writers', this)">
+                <i class="fas fa-user-tie"></i> Писатели
+                <span class="tab-count">{{ writers|length }}</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('works', this)">
+                <i class="fas fa-book"></i> Произведения
+                <span class="tab-count">{{ works|length }}</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('tests', this)">
+                <i class="fas fa-clipboard-check"></i> Тесты
+                <span class="tab-count">{{ tests|length }}</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('facts', this)">
+                <i class="fas fa-lightbulb"></i> Факты
+                <span class="tab-count">{{ facts|length }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- РЕЗУЛЬТАТЫ -->
+<div class="results-wrap">
+    <div class="container" style="max-width: 760px;">
+
+        <!-- ВСЕ -->
+        <div id="panel-all" class="tab-panel active">
+            {% if total_count == 0 %}
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <p>По запросу <strong>«{{ q }}»</strong> ничего не найдено.<br>Попробуйте другой запрос.</p>
+            </div>
+            {% else %}
+
+            {% for writer in writers %}
+            <a href="{% url 'writers' %}" class="result-card">
+                <div class="result-img">
+                    {% if writer.image_url %}<img src="{{ writer.image_url }}" alt="{{ writer.full_name }}">
+                    {% else %}<i class="fas fa-user-tie"></i>{% endif %}
+                </div>
+                <div class="result-body">
+                    <span class="result-badge">Писатель</span>
+                    <div class="result-title">{{ writer.full_name }}</div>
+                    <p class="result-meta">{{ writer.genre }} · {{ writer.century }} век · {{ writer.birth_year }}–{{ writer.death_year|default:"н.в." }}</p>
+                </div>
+                <i class="fas fa-chevron-right result-arrow"></i>
+            </a>
+            {% endfor %}
+
+            {% for work in works %}
+            <a href="{% url 'works' %}" class="result-card">
+                <div class="result-img">
+                    {% if work.cover_image %}<img src="{{ work.cover_image }}" alt="{{ work.title }}">
+                    {% else %}<i class="fas fa-book"></i>{% endif %}
+                </div>
+                <div class="result-body">
+                    <span class="result-badge">Произведение</span>
+                    <div class="result-title">{{ work.title }}</div>
+                    <p class="result-meta">{{ work.author_name.full_name }} · {{ work.genre }} · {{ work.publication_year }}</p>
+                </div>
+                <i class="fas fa-chevron-right result-arrow"></i>
+            </a>
+            {% endfor %}
+
+            {% for test in tests %}
+            <a href="{% url 'tests' %}" class="result-card">
+                <div class="result-img"><i class="fas fa-clipboard-check"></i></div>
+                <div class="result-body">
+                    <span class="result-badge">Тест</span>
+                    <div class="result-title">{{ test.title }}</div>
+                    <p class="result-meta">
+                        {{ test.get_difficulty_display }}
+                        {% if test.writer %} · {{ test.writer.full_name }}{% endif %}
+                        {% if test.work %} · {{ test.work.title }}{% endif %}
+                    </p>
+                </div>
+                <i class="fas fa-chevron-right result-arrow"></i>
+            </a>
+            {% endfor %}
+
+            {% for fact in facts %}
+            <a href="{% url 'facts' %}" class="result-card">
+                <div class="result-img">
+                    {% if fact.image_url %}<img src="{{ fact.image_url }}" alt="{{ fact.title }}">
+                    {% else %}<i class="fas fa-lightbulb"></i>{% endif %}
+                </div>
+                <div class="result-body">
+                    <span class="result-badge">Факт</span>
+                    <div class="result-title">{{ fact.title }}</div>
+                    <p class="result-meta">{{ fact.get_category_display }}{% if fact.writer %} · {{ fact.writer.full_name }}{% endif %}</p>
+                </div>
+                <i class="fas fa-chevron-right result-arrow"></i>
+            </a>
+            {% endfor %}
+
+            {% endif %}
+        </div>
+
+        <!-- ПИСАТЕЛИ -->
+        <div id="panel-writers" class="tab-panel">
+            {% if writers %}
+                {% for writer in writers %}
+                <a href="{% url 'writers' %}" class="result-card">
+                    <div class="result-img">
+                        {% if writer.image_url %}<img src="{{ writer.image_url }}" alt="{{ writer.full_name }}">
+                        {% else %}<i class="fas fa-user-tie"></i>{% endif %}
+                    </div>
+                    <div class="result-body">
+                        <span class="result-badge">Писатель</span>
+                        <div class="result-title">{{ writer.full_name }}</div>
+                        <p class="result-meta">{{ writer.genre }} · {{ writer.century }} век · {{ writer.birth_year }}–{{ writer.death_year|default:"н.в." }}</p>
+                    </div>
+                    <i class="fas fa-chevron-right result-arrow"></i>
+                </a>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-user-tie"></i>
+                <p>Писатели не найдены</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ПРОИЗВЕДЕНИЯ -->
+        <div id="panel-works" class="tab-panel">
+            {% if works %}
+                {% for work in works %}
+                <a href="{% url 'works' %}" class="result-card">
+                    <div class="result-img">
+                        {% if work.cover_image %}<img src="{{ work.cover_image }}" alt="{{ work.title }}">
+                        {% else %}<i class="fas fa-book"></i>{% endif %}
+                    </div>
+                    <div class="result-body">
+                        <span class="result-badge">Произведение</span>
+                        <div class="result-title">{{ work.title }}</div>
+                        <p class="result-meta">{{ work.author_name.full_name }} · {{ work.genre }} · {{ work.publication_year }}</p>
+                    </div>
+                    <i class="fas fa-chevron-right result-arrow"></i>
+                </a>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-book"></i>
+                <p>Произведения не найдены</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ТЕСТЫ -->
+        <div id="panel-tests" class="tab-panel">
+            {% if tests %}
+                {% for test in tests %}
+                <a href="{% url 'tests' %}" class="result-card">
+                    <div class="result-img"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="result-body">
+                        <span class="result-badge">Тест</span>
+                        <div class="result-title">{{ test.title }}</div>
+                        <p class="result-meta">
+                            {{ test.get_difficulty_display }}
+                            {% if test.writer %} · {{ test.writer.full_name }}{% endif %}
+                            {% if test.work %} · {{ test.work.title }}{% endif %}
+                        </p>
+                    </div>
+                    <i class="fas fa-chevron-right result-arrow"></i>
+                </a>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-clipboard-check"></i>
+                <p>Тесты не найдены</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ФАКТЫ -->
+        <div id="panel-facts" class="tab-panel">
+            {% if facts %}
+                {% for fact in facts %}
+                <a href="{% url 'facts' %}" class="result-card">
+                    <div class="result-img">
+                        {% if fact.image_url %}<img src="{{ fact.image_url }}" alt="{{ fact.title }}">
+                        {% else %}<i class="fas fa-lightbulb"></i>{% endif %}
+                    </div>
+                    <div class="result-body">
+                        <span class="result-badge">Факт</span>
+                        <div class="result-title">{{ fact.title }}</div>
+                        <p class="result-meta">{{ fact.get_category_display }}{% if fact.writer %} · {{ fact.writer.full_name }}{% endif %}</p>
+                    </div>
+                    <i class="fas fa-chevron-right result-arrow"></i>
+                </a>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-lightbulb"></i>
+                <p>Факты не найдены</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{% else %}
+<!-- НЕТ ЗАПРОСА -->
+<div class="container">
+    <div class="no-query">
+        <i class="fas fa-search"></i>
+        <h3>Введите запрос</h3>
+        <p style="font-size: 0.9rem;">Поиск по писателям, произведениям, тестам и фактам</p>
+    </div>
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>

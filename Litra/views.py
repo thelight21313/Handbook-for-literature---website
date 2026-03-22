@@ -11,7 +11,7 @@ from rest_framework import viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import F, Count
+from django.db.models import F, Count, Q
 from .filters import WriterFilter, WorksFilter, FactsFilter, TestFilter
 from .models import Writers, Works, Facts, Quizz, Question, Answer, Chats, Message
 from rest_framework.views import APIView
@@ -210,8 +210,24 @@ def tests(request, pk=None):
     return render(request, 'Litra/test.html')
 
 
-def search():
-    pass
+def search(request):
+    q = request.GET.get('q', '').strip()
+    context = {'q': q, 'writers': [], 'works': [], 'tests': [], 'facts': []}
+
+    if q:
+        context['writers'] = Writers.objects.filter(
+            Q(full_name__icontains=q) | Q(biography__icontains=q)
+        )
+        context['works'] = Works.objects.filter(
+            Q(title__icontains=q) | Q(description__icontains=q) | Q(author_name__icontains=q) | Q(genre__icontains=q)
+        )
+        context['tests'] = Quizz.objects.filter(
+            Q(titile__icontains=q) | Q(description__icontains=q)
+        )
+        context['facts'] = Quizz.objects.filter(
+            Q(titile__icontains=q) | Q(content__icontains=q)
+        )
+    return render(request, 'Litra/search.html', context)
 
 
 def about():

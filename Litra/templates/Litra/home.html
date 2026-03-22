@@ -3,654 +3,751 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Литературный справочник для учителей</title>
-
-    <!-- Bootstrap 5 CSS -->
+    <title>ЛитСправочник</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #8B4513;
-            --secondary-color: #2F4F2F;
-            --accent-color: #DAA520;
-            --background-light: #FAF6F1;
+            --primary: #8B4513;
+            --accent:  #DAA520;
+            --bg:      #FAF6F1;
+            --text:    #2C1810;
+            --muted:   #6B5D54;
         }
+
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: var(--background-light);
+            background: var(--bg);
+            color: var(--text);
         }
 
-        .hero-section {
+        /* ── NAVBAR ── */
+        .navbar {
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700; color: var(--primary) !important; font-size: 1.7rem;
+        }
+        .nav-link { font-weight: 500; color: var(--text) !important; transition: color 0.2s; }
+        .nav-link:hover { color: var(--primary) !important; }
+        .btn-logout {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; border-radius: 8px;
+            background: var(--primary); color: white !important;
+            font-size: 0.85rem; font-weight: 600; text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { background: #6d3410; }
+
+        /* ── HERO ── */
+        .hero {
             min-height: 100vh;
-            background: linear-gradient(135deg, #FAF6F1 0%, #E8DFD6 100%);
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(150deg, var(--primary) 0%, #6d3410 45%, #2C1810 100%);
+            position: relative; overflow: hidden;
+            display: flex; align-items: center;
+            padding-top: 72px;
         }
 
-        #particles-js {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
+        /* Декоративные круги */
+        .hero::before {
+            content: '';
+            position: absolute; top: -120px; right: -120px;
+            width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(218,165,32,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute; bottom: -100px; left: -80px;
+            width: 400px; height: 400px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(218,165,32,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Диагональный паттерн */
+        .hero-pattern {
+            position: absolute; inset: 0; pointer-events: none;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent, transparent 40px,
+                rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px
+            );
+        }
+
+        /* Золотая полоска сверху — как на логине */
+        .hero-top-bar {
+            position: absolute; top: 72px; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), rgba(218,165,32,0.3), transparent);
         }
 
         .hero-content {
-            position: relative;
-            z-index: 10;
+            position: relative; z-index: 2;
+            text-align: center; color: white;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(218,165,32,0.15);
+            border: 1px solid rgba(218,165,32,0.3);
+            padding: 6px 18px; border-radius: 50px;
+            font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em;
+            color: var(--accent); text-transform: uppercase;
+            margin-bottom: 24px;
+            animation: fadeUp 0.6s ease both;
         }
 
         .hero-title {
             font-family: 'Playfair Display', serif;
-            color: var(--primary-color);
+            font-size: clamp(2.4rem, 6vw, 4.2rem);
+            font-weight: 700; line-height: 1.15;
+            margin-bottom: 20px; color: white;
+            animation: fadeUp 0.7s ease 0.1s both;
         }
 
-        .feature-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-            border-radius: 20px;
-            overflow: hidden;
+        .hero-title span {
+            color: var(--accent);
+            font-style: italic;
         }
 
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important;
+        .hero-sub {
+            font-size: 1.05rem; opacity: 0.7; max-width: 520px;
+            margin: 0 auto 44px; line-height: 1.7; font-weight: 300;
+            animation: fadeUp 0.7s ease 0.2s both;
         }
 
-        .feature-icon {
-            font-size: 3.5rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* ── ПОИСК ── */
+        .search-wrap {
+            max-width: 580px; margin: 0 auto 48px;
+            animation: fadeUp 0.7s ease 0.3s both;
         }
 
-        .btn-primary-custom {
-            background: var(--accent-color);
-            border: none;
-            border-radius: 50px;
-            padding: 12px 30px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+        .search-box {
+            display: flex; align-items: center;
+            background: white; border-radius: 16px;
+            padding: 6px 6px 6px 22px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border: 1.5px solid rgba(218,165,32,0.2);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .btn-primary-custom:hover {
-            background: var(--primary-color);
-            transform: scale(1.05);
+        .search-box:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 4px rgba(218,165,32,0.1);
         }
 
-        .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            color: var(--primary-color) !important;
-            font-size: 1.8rem;
+        .search-box input {
+            flex: 1; border: none; outline: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem; color: var(--text);
+            background: transparent; padding: 8px 0;
         }
 
-        .nav-link {
-            font-weight: 500;
-            color: #2C1810 !important;
-            position: relative;
-            transition: color 0.3s ease;
+        .search-box input::placeholder { color: rgba(107,93,84,0.5); }
+
+        .search-box button {
+            background: var(--primary); color: white;
+            border: none; border-radius: 11px;
+            padding: 12px 24px; font-size: 0.88rem;
+            font-weight: 600; font-family: 'Montserrat', sans-serif;
+            cursor: pointer; transition: background 0.2s;
+            display: flex; align-items: center; gap: 8px; white-space: nowrap;
         }
 
-        .nav-link:hover {
-            color: var(--primary-color) !important;
+        .search-box button:hover { background: #6d3410; }
+
+        .search-hint {
+            font-size: 0.75rem; opacity: 0.45; margin-top: 10px;
+            letter-spacing: 0.03em;
         }
 
-        .stat-card {
+        /* ── БЫСТРЫЕ КНОПКИ ── */
+        .hero-nav {
+            display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+            animation: fadeUp 0.7s ease 0.4s both;
+        }
+
+        .hero-nav-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 10px 20px; border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.85); font-size: 0.85rem;
+            font-weight: 500; text-decoration: none;
+            transition: all 0.2s; font-family: 'Montserrat', sans-serif;
+        }
+
+        .hero-nav-btn:hover {
+            background: rgba(218,165,32,0.2);
+            border-color: rgba(218,165,32,0.4);
+            color: white; transform: translateY(-2px);
+        }
+
+        .hero-nav-btn i { color: var(--accent); font-size: 0.8rem; }
+
+        /* ── СТАТИСТИКА ── */
+        .stats-row {
+            padding: 50px 0;
             background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
+            border-bottom: 1px solid rgba(139,69,19,0.08);
         }
 
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--accent-color);
+        .stat-item { text-align: center; padding: 10px; }
+
+        .stat-num {
             font-family: 'Playfair Display', serif;
+            font-size: 2.8rem; font-weight: 700;
+            color: var(--accent); line-height: 1;
+            margin-bottom: 6px;
         }
 
-        .ai-assistant-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            border: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.8rem;
+        .stat-label {
+            font-size: 0.82rem; color: var(--muted);
+            font-weight: 500; text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .ai-assistant-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        .stat-divider {
+            width: 1px; background: rgba(139,69,19,0.1);
+            align-self: stretch; margin: 10px 0;
         }
 
-        .search-wrapper {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .search-input {
-            border-radius: 50px;
-            padding: 15px 60px 15px 25px;
-            border: 2px solid var(--accent-color);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .search-btn {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            border: none;
-            color: white;
-        }
-
-        .search-btn:hover {
-            background: var(--primary-color);
+        /* ── РАЗДЕЛЫ ── */
+        .section-eyebrow {
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--accent);
+            margin-bottom: 8px;
         }
 
         .section-title {
             font-family: 'Playfair Display', serif;
-            color: var(--primary-color);
-            font-weight: 700;
-            margin-bottom: 3rem;
+            font-size: 2rem; font-weight: 700; color: var(--primary);
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: white; border-radius: 18px;
+            padding: 32px 28px; height: 100%;
+            border: 1px solid rgba(139,69,19,0.07);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: all 0.25s; text-decoration: none;
+            display: block; position: relative; overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0; transition: opacity 0.25s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 48px rgba(139,69,19,0.12);
+            border-color: rgba(139,69,19,0.15);
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-icon {
+            width: 56px; height: 56px; border-radius: 14px;
+            background: linear-gradient(135deg, rgba(139,69,19,0.08), rgba(218,165,32,0.12));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem; color: var(--primary);
+            margin-bottom: 10px; font-weight: 600;
+        }
+
+        .feature-card p {
+            font-size: 0.88rem; color: var(--muted);
+            line-height: 1.65; margin: 0;
+        }
+
+        .feature-arrow {
+            position: absolute; bottom: 24px; right: 24px;
+            color: rgba(139,69,19,0.2); font-size: 1rem;
+            transition: all 0.25s;
+        }
+
+        .feature-card:hover .feature-arrow {
+            color: var(--accent); transform: translateX(4px);
+        }
+
+        /* ── AI секция ── */
+        .ai-section {
+            background: linear-gradient(135deg, var(--primary) 0%, #6d3410 100%);
+            border-radius: 24px; padding: 56px 60px;
+            position: relative; overflow: hidden;
+            color: white;
+        }
+
+        .ai-section::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(
+                45deg, transparent, transparent 30px,
+                rgba(255,255,255,0.02) 30px, rgba(255,255,255,0.02) 31px
+            );
+        }
+
+        .ai-section::after {
+            content: '';
+            position: absolute; right: -60px; top: -60px;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(218,165,32,0.2) 0%, transparent 70%);
+        }
+
+        .ai-section-content { position: relative; z-index: 1; }
+
+        .ai-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem; margin-bottom: 16px;
+        }
+
+        .ai-section p {
+            opacity: 0.75; font-size: 0.95rem; line-height: 1.7;
+            max-width: 480px; margin-bottom: 28px;
+        }
+
+        .ai-features { list-style: none; padding: 0; margin-bottom: 32px; }
+        .ai-features li {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.88rem; opacity: 0.85; margin-bottom: 10px;
+        }
+        .ai-features li i { color: var(--accent); font-size: 0.8rem; }
+
+        .btn-ai {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--accent); color: var(--text);
+            padding: 14px 28px; border-radius: 12px;
+            font-weight: 700; font-size: 0.9rem;
+            text-decoration: none; transition: all 0.2s;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-ai:hover {
+            background: #c8941a; color: var(--text);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .ai-robot-icon {
+            font-size: 8rem; opacity: 0.12;
+            position: absolute; right: 40px; bottom: -10px;
+            color: var(--accent);
+        }
+
+        /* ── ПОСЛЕДНИЕ ОБНОВЛЕНИЯ ── */
+        .update-card {
+            background: white; border-radius: 16px;
+            overflow: hidden; height: 100%;
+            border: 1px solid rgba(139,69,19,0.07);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            transition: all 0.25s; text-decoration: none;
+            display: block;
+        }
+
+        .update-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(139,69,19,0.1);
+        }
+
+        .update-card-img {
+            width: 100%; height: 180px; object-fit: cover;
+            background: linear-gradient(135deg, rgba(139,69,19,0.1), rgba(218,165,32,0.1));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: rgba(139,69,19,0.2);
+        }
+
+        .update-card-img img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .update-card-body { padding: 20px; }
+
+        .update-badge {
+            display: inline-block;
+            background: rgba(139,69,19,0.08); color: var(--primary);
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.04em;
+            margin-bottom: 10px;
+        }
+
+        .update-card h5 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem; color: var(--text);
+            margin-bottom: 6px; font-weight: 600; line-height: 1.4;
+        }
+
+        .update-card p {
+            font-size: 0.82rem; color: var(--muted);
+            line-height: 1.6; margin: 0;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--text);
+            color: rgba(255,255,255,0.6);
+            padding: 48px 0 28px;
+        }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem; font-weight: 700;
+            color: white; margin-bottom: 10px;
+        }
+
+        .footer-brand i { color: var(--accent); }
+
+        .footer-desc {
+            font-size: 0.83rem; line-height: 1.7;
+            max-width: 260px; opacity: 0.6;
+        }
+
+        .footer-title {
+            font-size: 0.75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.4); margin-bottom: 16px;
+        }
+
+        .footer-links { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 8px; }
+        .footer-links a {
+            color: rgba(255,255,255,0.55); font-size: 0.87rem;
+            text-decoration: none; transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--accent); }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.07);
+            margin-top: 40px; padding-top: 20px;
+            text-align: center; font-size: 0.78rem; opacity: 0.35;
+        }
+
+        /* ── AI FAB ── */
+        .ai-fab {
+            position: fixed; bottom: 28px; right: 28px;
+            width: 62px; height: 62px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none; box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+            cursor: pointer; z-index: 999;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem;
+            transition: all 0.2s; text-decoration: none;
+        }
+
+        .ai-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .ai-section { padding: 36px 28px; }
+            .hero-title { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fas fa-book-open me-2" style="color: var(--accent-color);"></i>
-                ЛитСправочник
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'writers' %}">Писатели</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'works' %}">Произведения</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tests' %}">Тесты</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'facts' %}">Интересные факты</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'ai-assistant' %}">AI-ассистент</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Выход</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'search' %}">
-                            <i class="fas fa-search"></i>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="fas fa-book-open me-2" style="color: var(--accent);"></i>ЛитСправочник
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-1">
+                <li class="nav-item"><a class="nav-link" href="{% url 'writers' %}">Писатели</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'works' %}">Произведения</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'tests' %}">Тесты</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'facts' %}">Факты</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'ai-assistant' %}">AI-ассистент</a></li>
+                <li class="nav-item ms-2">
+                    <a href="{% url 'logout' %}" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Выйти
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-pattern"></div>
+    <div class="hero-top-bar"></div>
+    <div class="container hero-content py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+
+                <div class="hero-eyebrow">
+                    <i class="fas fa-feather-alt"></i>
+                    Русская классическая литература
+                </div>
+
+                <h1 class="hero-title">
+                    Всё о <span>русской литературе</span><br>в одном месте
+                </h1>
+
+                <p class="hero-sub">
+                    Биографии писателей, краткие содержания произведений, тесты и интересные факты
+                </p>
+
+                <!-- ПОИСК -->
+                <div class="search-wrap">
+                    <form action="{% url 'search' %}" method="GET">
+                        <div class="search-box">
+                            <i class="fas fa-search me-3" style="color: var(--muted); font-size: 0.9rem;"></i>
+                            <input type="text" name="q" placeholder="Пушкин, Война и мир, XIX век..."
+                                   value="{{ request.GET.q|default:'' }}" autocomplete="off">
+                            <button type="submit">
+                                <i class="fas fa-search"></i> Найти
+                            </button>
+                        </div>
+                    </form>
+                    <p class="search-hint">Поиск по писателям, произведениям, тестам и фактам</p>
+                </div>
+
+                <!-- Быстрые ссылки -->
+                <div class="hero-nav">
+                    <a href="{% url 'writers' %}" class="hero-nav-btn">
+                        <i class="fas fa-user-tie"></i> Писатели
+                    </a>
+                    <a href="{% url 'works' %}" class="hero-nav-btn">
+                        <i class="fas fa-book"></i> Произведения
+                    </a>
+                    <a href="{% url 'tests' %}" class="hero-nav-btn">
+                        <i class="fas fa-clipboard-check"></i> Тесты
+                    </a>
+                    <a href="{% url 'facts' %}" class="hero-nav-btn">
+                        <i class="fas fa-lightbulb"></i> Факты
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- СТАТИСТИКА -->
+<section class="stats-row">
+    <div class="container">
+        <div class="row g-0 justify-content-center align-items-center">
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-num">{{ writers_count }}</div>
+                    <div class="stat-label">Писателей</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-num">{{ works_count }}</div>
+                    <div class="stat-label">Произведений</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-num">{{ tests_count }}</div>
+                    <div class="stat-label">Тестов</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-num">{{ facts_count }}</div>
+                    <div class="stat-label">Фактов</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- РАЗДЕЛЫ -->
+<section class="py-5" style="padding-top: 80px !important;">
+    <div class="container py-4">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <p class="section-eyebrow">Навигация</p>
+            <h2 class="section-title mb-0">Основные разделы</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="50">
+                <a href="{% url 'writers' %}" class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-user-tie"></i></div>
+                    <h3>Писатели</h3>
+                    <p>Биографии и творческий путь великих русских писателей и поэтов</p>
+                    <i class="fas fa-arrow-right feature-arrow"></i>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <a href="{% url 'works' %}" class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-book"></i></div>
+                    <h3>Произведения</h3>
+                    <p>Краткие содержания и анализ классических произведений русской литературы</p>
+                    <i class="fas fa-arrow-right feature-arrow"></i>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="150">
+                <a href="{% url 'tests' %}" class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-clipboard-check"></i></div>
+                    <h3>Тесты</h3>
+                    <p>Интерактивные тесты для проверки знаний по русской классике</p>
+                    <i class="fas fa-arrow-right feature-arrow"></i>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <a href="{% url 'facts' %}" class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h3>Интересные факты</h3>
+                    <p>Необычные и малоизвестные факты о писателях и их произведениях</p>
+                    <i class="fas fa-arrow-right feature-arrow"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AI СЕКЦИЯ -->
+<section class="py-5">
+    <div class="container py-3">
+        <div class="ai-section" data-aos="fade-up">
+            <div class="ai-section-content">
+                <div class="row align-items-center">
+                    <div class="col-lg-7">
+                        <p class="section-eyebrow" style="color: var(--accent);">Искусственный интеллект</p>
+                        <h2>AI-ассистент по литературе</h2>
+                        <p>Задавайте любые вопросы о русской литературе — писателях, произведениях, исторических эпохах. Получайте развёрнутые ответы мгновенно.</p>
+                        <ul class="ai-features">
+                            <li><i class="fas fa-check"></i> Анализ произведений и образов</li>
+                            <li><i class="fas fa-check"></i> Биографические данные</li>
+                            <li><i class="fas fa-check"></i> Сравнение авторов и стилей</li>
+                            <li><i class="fas fa-check"></i> История чатов сохраняется</li>
+                        </ul>
+                        <a href="{% url 'ai-assistant' %}" class="btn-ai">
+                            <i class="fas fa-robot"></i> Начать диалог
                         </a>
-                    </li>
+                    </div>
+                </div>
+            </div>
+            <i class="fas fa-robot ai-robot-icon"></i>
+        </div>
+    </div>
+</section>
+
+<!-- ПОСЛЕДНИЕ ОБНОВЛЕНИЯ -->
+<section class="py-5" style="background: white;">
+    <div class="container py-4">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <p class="section-eyebrow">База данных</p>
+            <h2 class="section-title mb-0">Последние добавления</h2>
+        </div>
+
+        {% if recent_writers or recent_works %}
+        <div class="row g-4">
+            {% for writer in recent_writers %}
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}50">
+                <a href="{% url 'writers' %}" class="update-card">
+                    <div class="update-card-img">
+                        {% if writer.image_url %}
+                            <img src="{{ writer.image_url }}" alt="{{ writer.full_name }}">
+                        {% else %}
+                            <i class="fas fa-user-tie"></i>
+                        {% endif %}
+                    </div>
+                    <div class="update-card-body">
+                        <span class="update-badge">Писатель</span>
+                        <h5>{{ writer.full_name }}</h5>
+                        <p>{{ writer.genre }} · {{ writer.century }} век</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+
+            {% for work in recent_works %}
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}50">
+                <a href="{% url 'works' %}" class="update-card">
+                    <div class="update-card-img">
+                        {% if work.cover_image %}
+                            <img src="{{ work.cover_image }}" alt="{{ work.title }}">
+                        {% else %}
+                            <i class="fas fa-book"></i>
+                        {% endif %}
+                    </div>
+                    <div class="update-card-body">
+                        <span class="update-badge">Произведение</span>
+                        <h5>{{ work.title }}</h5>
+                        <p>{{ work.author_name.full_name }} · {{ work.publication_year }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5" style="color: var(--muted);">
+            <i class="fas fa-book-open" style="font-size: 3rem; opacity: 0.2; display: block; margin-bottom: 16px;"></i>
+            <p>База данных пока пустая</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-5 col-md-6">
+                <div class="footer-brand">
+                    <i class="fas fa-book-open me-2"></i>ЛитСправочник
+                </div>
+                <p class="footer-desc">
+                    Справочник по русской классической литературе с AI-ассистентом.
+                </p>
+            </div>
+            <div class="col-lg-3 col-md-6 offset-lg-4">
+                <div class="footer-title">Разделы</div>
+                <ul class="footer-links">
+                    <li><a href="{% url 'writers' %}">Писатели</a></li>
+                    <li><a href="{% url 'works' %}">Произведения</a></li>
+                    <li><a href="{% url 'tests' %}">Тесты</a></li>
+                    <li><a href="{% url 'facts' %}">Факты</a></li>
+                    <li><a href="{% url 'ai-assistant' %}">AI-ассистент</a></li>
                 </ul>
             </div>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero-section d-flex align-items-center">
-        <div id="particles-js"></div>
-        <div class="container hero-content">
-            <div class="row justify-content-center text-center">
-                <div class="col-lg-10">
-                    <h1 class="hero-title display-1 fw-bold mb-4 animate__animated animate__fadeInDown">
-                        Литературный справочник для учителей
-                    </h1>
-                    <p class="lead mb-5 text-muted animate__animated animate__fadeInUp animate__delay-1s">
-                        Ваш персональный помощник в мире русской литературы
-                    </p>
-
-                    <!-- Search Bar -->
-                    <div class="search-wrapper mb-5 animate__animated animate__fadeInUp animate__delay-2s" data-aos="fade-up">
-                        <form action="{% url 'search' %}" method="GET">
-                            <input type="text" name="q" class="form-control search-input"
-                                   placeholder="Поиск по писателям и произведениям...">
-                            <button type="submit" class="search-btn">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <div class="footer-bottom">
+            &copy; 2025 ЛитСправочник
         </div>
-    </section>
+    </div>
+</footer>
 
-    <!-- Feature Cards Section -->
-    <section class="py-5 bg-light">
-        <div class="container py-5">
-            <h2 class="section-title text-center" data-aos="fade-up">Основные разделы</h2>
+<!-- AI FAB -->
+<a href="{% url 'ai-assistant' %}" class="ai-fab">
+    <i class="fas fa-robot"></i>
+</a>
 
-            <div class="row g-4">
-                <!-- Card 1: Писатели -->
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                    <a href="{% url 'writers' %}" class="text-decoration-none">
-                        <div class="card feature-card shadow h-100">
-                            <div class="card-body text-center p-4">
-                                <div class="feature-icon mb-3">
-                                    <i class="fas fa-user-tie"></i>
-                                </div>
-                                <h3 class="h4 mb-3" style="color: var(--primary-color); font-family: 'Playfair Display', serif;">
-                                    Писатели
-                                </h3>
-                                <p class="text-muted">
-                                    Биографии, хронология жизни и творчества великих русских писателей
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Card 2: Произведения -->
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                    <a href="{% url 'works' %}" class="text-decoration-none">
-                        <div class="card feature-card shadow h-100">
-                            <div class="card-body text-center p-4">
-                                <div class="feature-icon mb-3">
-                                    <i class="fas fa-book"></i>
-                                </div>
-                                <h3 class="h4 mb-3" style="color: var(--primary-color); font-family: 'Playfair Display', serif;">
-                                    Произведения
-                                </h3>
-                                <p class="text-muted">
-                                    Полный анализ, краткое содержание и материалы для уроков
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Card 3: Тесты -->
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                    <a href="{% url 'tests' %}" class="text-decoration-none">
-                        <div class="card feature-card shadow h-100">
-                            <div class="card-body text-center p-4">
-                                <div class="feature-icon mb-3">
-                                    <i class="fas fa-clipboard-check"></i>
-                                </div>
-                                <h3 class="h4 mb-3" style="color: var(--primary-color); font-family: 'Playfair Display', serif;">
-                                    Тесты
-                                </h3>
-                                <p class="text-muted">
-                                    Проверьте свои знания и знания учеников интерактивными тестами
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Card 4: Интересные факты -->
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
-                    <a href="{% url 'facts' %}" class="text-decoration-none">
-                        <div class="card feature-card shadow h-100">
-                            <div class="card-body text-center p-4">
-                                <div class="feature-icon mb-3">
-                                    <i class="fas fa-lightbulb"></i>
-                                </div>
-                                <h3 class="h4 mb-3" style="color: var(--primary-color); font-family: 'Playfair Display', serif;">
-                                    Интересные факты
-                                </h3>
-                                <p class="text-muted">
-                                    Удивительные истории из жизни писателей и о произведениях
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Statistics Section -->
-    <section class="py-5" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
-        <div class="container py-5">
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                    <div class="stat-card">
-                        <div class="stat-number">{{ writers_count|default:"50+" }}</div>
-                        <p class="mb-0 text-muted">Писателей в базе</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="stat-card">
-                        <div class="stat-number">{{ works_count|default:"200+" }}</div>
-                        <p class="mb-0 text-muted">Произведений</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                    <div class="stat-card">
-                        <div class="stat-number">{{ tests_count|default:"100+" }}</div>
-                        <p class="mb-0 text-muted">Тестов</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
-                    <div class="stat-card">
-                        <div class="stat-number">{{ facts_count|default:"500+" }}</div>
-                        <p class="mb-0 text-muted">Интересных фактов</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- AI Assistant CTA Section -->
-    <section class="py-5 bg-light">
-        <div class="container py-5">
-            <div class="row align-items-center">
-                <div class="col-lg-6" data-aos="fade-right">
-                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600"
-                         alt="AI Assistant" class="img-fluid rounded shadow">
-                </div>
-                <div class="col-lg-6" data-aos="fade-left">
-                    <h2 class="section-title">AI-ассистент всегда готов помочь</h2>
-                    <p class="lead text-muted mb-4">
-                        Задавайте вопросы о русской литературе, писателях и произведениях.
-                        Получайте мгновенные ответы и рекомендации для ваших уроков.
-                    </p>
-                    <ul class="list-unstyled mb-4">
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            Анализ произведений
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            Биографические данные
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            Подготовка к урокам
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            Литературные связи
-                        </li>
-                    </ul>
-                    <a href="{% url 'ai-assistant' %}" class="btn btn-primary-custom btn-lg">
-                        <i class="fas fa-robot me-2"></i>
-                        Начать диалог с AI
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Recent Updates Section -->
-    <section class="py-5">
-        <div class="container py-5">
-            <h2 class="section-title text-center" data-aos="fade-up">Последние обновления</h2>
-
-            <div class="row g-4">
-                {% for update in recent_updates %}
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
-                    <div class="card shadow-sm border-0 h-100">
-                        <img src="{{ update.image_url }}" class="card-img-top" alt="{{ update.title }}">
-                        <div class="card-body">
-                            <span class="badge bg-warning text-dark mb-2">{{ update.category }}</span>
-                            <h5 class="card-title">{{ update.title }}</h5>
-                            <p class="card-text text-muted">{{ update.description }}</p>
-                            <a href="{{ update.url }}" class="btn btn-outline-primary btn-sm">Подробнее</a>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <!-- Placeholder cards if no updates -->
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="card shadow-sm border-0 h-100">
-                        <img src="https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=400" class="card-img-top" alt="Update">
-                        <div class="card-body">
-                            <span class="badge bg-warning text-dark mb-2">Писатель</span>
-                            <h5 class="card-title">Александр Пушкин</h5>
-                            <p class="card-text text-muted">Обновлена биография и добавлены новые факты</p>
-                            <a href="#" class="btn btn-outline-primary btn-sm">Подробнее</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="card shadow-sm border-0 h-100">
-                        <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400" class="card-img-top" alt="Update">
-                        <div class="card-body">
-                            <span class="badge bg-warning text-dark mb-2">Произведение</span>
-                            <h5 class="card-title">Война и мир</h5>
-                            <p class="card-text text-muted">Добавлен полный анализ и материалы для урока</p>
-                            <a href="#" class="btn btn-outline-primary btn-sm">Подробнее</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="card shadow-sm border-0 h-100">
-                        <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400" class="card-img-top" alt="Update">
-                        <div class="card-body">
-                            <span class="badge bg-warning text-dark mb-2">Тест</span>
-                            <h5 class="card-title">Золотой век русской поэзии</h5>
-                            <p class="card-text text-muted">Новый тест для проверки знаний учеников</p>
-                            <a href="#" class="btn btn-outline-primary btn-sm">Подробнее</a>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-5">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-4">
-                    <h5 class="mb-3" style="font-family: 'Playfair Display', serif;">
-                        <i class="fas fa-book-open me-2" style="color: var(--accent-color);"></i>
-                        ЛитСправочник
-                    </h5>
-                    <p class="text-muted">
-                        Ваш персональный помощник в мире русской литературы.
-                        Создано для учителей с любовью к литературе.
-                    </p>
-                </div>
-                <div class="col-lg-2">
-                    <h6 class="mb-3">Разделы</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'writers' %}" class="text-muted text-decoration-none">Писатели</a></li>
-                        <li><a href="{% url 'works' %}" class="text-muted text-decoration-none">Произведения</a></li>
-                        <li><a href="{% url 'tests' %}" class="text-muted text-decoration-none">Тесты</a></li>
-                        <li><a href="{% url 'facts' %}" class="text-muted text-decoration-none">Факты</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3">
-                    <h6 class="mb-3">Поддержка</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'about' %}" class="text-muted text-decoration-none">О проекте</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Контакты</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3">
-                    <h6 class="mb-3">Социальные сети</h6>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-light fs-4"><i class="fab fa-vk"></i></a>
-                        <a href="#" class="text-light fs-4"><i class="fab fa-telegram"></i></a>
-                        <a href="#" class="text-light fs-4"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-            </div>
-            <hr class="my-4 bg-secondary">
-            <div class="row">
-                <div class="col text-center text-muted">
-                    <small>&copy; 2024 ЛитСправочник. Все права защищены.</small>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Floating AI Assistant Button -->
-    <button class="ai-assistant-btn animate__animated animate__bounceIn animate__delay-3s"
-            onclick="window.location.href='{% url 'ai-assistant' %}'">
-        <i class="fas fa-robot"></i>
-    </button>
-
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- AOS Animation JS -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
-    <!-- Particles.js -->
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-
-    <!-- jQuery (для некоторых анимаций) -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 1000,
-            once: true,
-            offset: 100
-        });
-
-        // Particles.js Configuration
-        particlesJS('particles-js', {
-            particles: {
-                number: {
-                    value: 80,
-                    density: {
-                        enable: true,
-                        value_area: 800
-                    }
-                },
-                color: {
-                    value: ['#8B4513', '#DAA520', '#2F4F2F']
-                },
-                shape: {
-                    type: ['circle', 'triangle'],
-                    stroke: {
-                        width: 0,
-                        color: '#000000'
-                    }
-                },
-                opacity: {
-                    value: 0.3,
-                    random: true,
-                    anim: {
-                        enable: true,
-                        speed: 1,
-                        opacity_min: 0.1,
-                        sync: false
-                    }
-                },
-                size: {
-                    value: 5,
-                    random: true,
-                    anim: {
-                        enable: true,
-                        speed: 2,
-                        size_min: 0.1,
-                        sync: false
-                    }
-                },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#8B4513',
-                    opacity: 0.2,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: true,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: {
-                        enable: true,
-                        mode: 'grab'
-                    },
-                    onclick: {
-                        enable: true,
-                        mode: 'push'
-                    },
-                    resize: true
-                },
-                modes: {
-                    grab: {
-                        distance: 140,
-                        line_linked: {
-                            opacity: 0.5
-                        }
-                    },
-                    push: {
-                        particles_nb: 4
-                    }
-                }
-            },
-            retina_detect: true
-        });
-
-        // Navbar scroll effect
-        $(window).scroll(function() {
-            if ($(this).scrollTop() > 50) {
-                $('.navbar').addClass('shadow-lg');
-            } else {
-                $('.navbar').removeClass('shadow-lg');
-            }
-        });
-
-        // Smooth scrolling
-        $('a[href^="#"]').on('click', function(event) {
-            var target = $(this.getAttribute('href'));
-            if(target.length) {
-                event.preventDefault();
-                $('html, body').stop().animate({
-                    scrollTop: target.offset().top - 80
-                }, 1000);
-            }
-        });
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 700, once: true, offset: 60 });
+</script>
 </body>
 </html>
