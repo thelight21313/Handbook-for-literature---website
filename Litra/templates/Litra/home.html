@@ -661,50 +661,70 @@
             <h2 class="section-title mb-0">Последние добавления</h2>
         </div>
 
-        {% if recent_writers or recent_works %}
+        {% if recent %}
         <div class="row g-4">
-            {% for writer in recent_writers %}
+            {% for item in recent %}
+            {% with obj=item.content_object model=item.content_type.model %}
             <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}50">
+
+                {% if model == 'writers' %}
                 <a href="{% url 'writers' %}" class="update-card">
                     <div class="update-card-img">
-                        {% if writer.image_url %}
-                            <img src="{{ writer.image_url }}" alt="{{ writer.full_name }}">
-                        {% else %}
-                            <i class="fas fa-user-tie"></i>
-                        {% endif %}
+                        {% if obj.image_url %}<img src="{{ obj.image_url }}" alt="{{ obj.full_name }}">
+                        {% else %}<i class="fas fa-user-tie"></i>{% endif %}
                     </div>
                     <div class="update-card-body">
                         <span class="update-badge">Писатель</span>
-                        <h5>{{ writer.full_name }}</h5>
-                        <p>{{ writer.genre }} · {{ writer.century }} век</p>
+                        <h5>{{ obj.full_name }}</h5>
+                        <p>{{ obj.genre }} · {{ obj.century }} век</p>
                     </div>
                 </a>
-            </div>
-            {% endfor %}
 
-            {% for work in recent_works %}
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}50">
+                {% elif model == 'works' %}
                 <a href="{% url 'works' %}" class="update-card">
                     <div class="update-card-img">
-                        {% if work.cover_image %}
-                            <img src="{{ work.cover_image }}" alt="{{ work.title }}">
-                        {% else %}
-                            <i class="fas fa-book"></i>
-                        {% endif %}
+                        {% if obj.cover_image %}<img src="{{ obj.cover_image }}" alt="{{ obj.title }}">
+                        {% else %}<i class="fas fa-book"></i>{% endif %}
                     </div>
                     <div class="update-card-body">
                         <span class="update-badge">Произведение</span>
-                        <h5>{{ work.title }}</h5>
-                        <p>{{ work.author_name.full_name }} · {{ work.publication_year }}</p>
+                        <h5>{{ obj.title }}</h5>
+                        <p>{{ obj.author_name.full_name }} · {{ obj.publication_year }}</p>
                     </div>
                 </a>
+
+                {% elif model == 'quizz' %}
+                <a href="{% url 'tests' %}" class="update-card">
+                    <div class="update-card-img"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="update-card-body">
+                        <span class="update-badge">Тест</span>
+                        <h5>{{ obj.title }}</h5>
+                        <p>{{ obj.get_difficulty_display }}</p>
+                    </div>
+                </a>
+
+                {% elif model == 'facts' %}
+                <a href="{% url 'facts' %}" class="update-card">
+                    <div class="update-card-img">
+                        {% if obj.image_url %}<img src="{{ obj.image_url }}" alt="{{ obj.title }}">
+                        {% else %}<i class="fas fa-lightbulb"></i>{% endif %}
+                    </div>
+                    <div class="update-card-body">
+                        <span class="update-badge">Факт</span>
+                        <h5>{{ obj.title }}</h5>
+                        <p>{{ obj.get_category_display }}</p>
+                    </div>
+                </a>
+                {% endif %}
+
             </div>
+            {% endwith %}
             {% endfor %}
         </div>
         {% else %}
         <div class="text-center py-5" style="color: var(--muted);">
             <i class="fas fa-book-open" style="font-size: 3rem; opacity: 0.2; display: block; margin-bottom: 16px;"></i>
-            <p>База данных пока пустая</p>
+            <p>Пока ничего не добавлено</p>
         </div>
         {% endif %}
     </div>
