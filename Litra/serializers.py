@@ -94,3 +94,4 @@ class MessageSerializer(serializers.ModelSerializer):
         model=Message
         fields = ['id', 'role', 'content']
 
+

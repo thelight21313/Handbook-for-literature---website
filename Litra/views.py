@@ -13,7 +13,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import F, Count, Q
 from .filters import WriterFilter, WorksFilter, FactsFilter, TestFilter
-from .models import Writers, Works, Facts, Quizz, Question, Answer, Chats, Message
+from .models import Writers, Works, Facts, Quizz, Question, Answer, Chats, Message, RecentlyUpdate
 from rest_framework.views import APIView
 from django.contrib.auth.decorators import user_passes_test, login_required
 from .serializers import WriterSerializer, WorksSerializer, FactsSerializer, FastTest, PropertyTest, ChatSerializer, \
@@ -64,7 +64,8 @@ def register(request):
 
 @login_required
 def home(request):
-    return render(request, "Litra/home.html")
+    context = RecentlyUpdate.objects.select_related('content_type').order_by('created_at')
+    return render(request, "Litra/home.html", {'recent': context})
 
 
 class WriterViewSet(ListMixin, FavoriteMixin, viewsets.ModelViewSet):
@@ -219,7 +220,7 @@ def search(request):
             Q(full_name__icontains=q) | Q(biography__icontains=q)
         )
         context['works'] = Works.objects.filter(
-            Q(title__icontains=q) | Q(description__icontains=q) | Q(author_name__icontains=q) | Q(genre__icontains=q)
+            Q(title__icontains=q) | Q(description__icontains=q) | Q(author_name__full_name__icontains=q) | Q(genre__icontains=q)
         )
         context['tests'] = Quizz.objects.filter(
             Q(titile__icontains=q) | Q(description__icontains=q)

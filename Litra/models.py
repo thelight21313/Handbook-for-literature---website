@@ -1,5 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
+
+class RecentlyUpdate(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Writers(models.Model):
@@ -13,6 +22,7 @@ class Writers(models.Model):
     biography = models.TextField()
     century = models.IntegerField()
     favorited_by = models.ManyToManyField(User, related_name='favorite_writers', blank=True, default=None)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.full_name
@@ -31,6 +41,7 @@ class Works(models.Model):
     publication_year = models.IntegerField()
     description = models.TextField()
     favorited_by = models.ManyToManyField(User, related_name='favorite_books', blank=True, default=None)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
