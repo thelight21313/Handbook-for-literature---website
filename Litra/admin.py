@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Litra.models import Writers, Works, Facts, Quizz, Question, Answer
+from Litra.models import Writers, Works, Facts, Quizz, Question, Answer, RecentlyUpdate
 
 # Register your models here.
 admin.site.register(Writers)
@@ -9,3 +9,4 @@ admin.site.register(Facts)
 admin.site.register(Quizz)
 admin.site.register(Question)
 admin.site.register(Answer)
+admin.site.register(RecentlyUpdate)
